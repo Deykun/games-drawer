@@ -23,7 +23,7 @@ const Canvas = ({ className, height = 400, width = 700, runGame }: Props) => {
   }, []);
 
   return (
-      <canvas ref={canvasRef} height={height} width={700} className={className} />
+      <canvas ref={canvasRef} height={height} width={width} className={className} />
   );
 }
 
