@@ -1,8 +1,18 @@
+import { SupportedKeys } from './types'
 import { Player } from './objects/player'
 
-const game: {
-  player?: Player,
-} = {};
+let canvas = undefined as unknown as HTMLCanvasElement;
+let ctx = undefined as unknown as CanvasRenderingContext2D;
+let player = undefined as Player | undefined;
+
+const pressedKeys: SupportedKeys = {
+  ArrowUp: false,
+  ArrowDown: false,
+  ArrowLeft: false,
+  ArrowRight: false,
+};
+
+const allowedKeys = Object.keys(pressedKeys);
 
 const world = [
   [1, 1, 1, 1, 1],
@@ -15,7 +25,7 @@ const world = [
 const tileHeight = 60;
 const tileWidth = 60;
 
-const drawWorld = ({ ctx }: { ctx: CanvasRenderingContext2D }) => {
+const drawWorld = () => {
   world.forEach((row, rowIndex) => {
     row.forEach((cell, columnIndex) => {
       if (cell === 1) {
@@ -29,22 +39,41 @@ const drawWorld = ({ ctx }: { ctx: CanvasRenderingContext2D }) => {
   })
 }
 
-const drawPlayer = ({ ctx }: { ctx: CanvasRenderingContext2D }) => {
-  if (!game.player) {
-    game.player = new Player(ctx, 100, 100);
+const drawPlayer = () => {
+  if (!player) {
+    player = new Player({ canvas, ctx, x: 100, y: 100 });
   }
 
-  game.player.draw();
+  player.draw();
+  player.move(pressedKeys)
 }
 
-const renderFrame = ({ ctx }: { ctx: CanvasRenderingContext2D }) => {
-  window.requestAnimationFrame(() => renderFrame({ ctx }));
+const renderFrame = () => {
+  window.requestAnimationFrame(renderFrame);
 
-  drawWorld({ ctx });
-  drawPlayer({ ctx });
+  drawWorld();
+  drawPlayer();
+}
+
+const initEventListeners = () => {
+  window.addEventListener('keydown', (e) => {
+    if (allowedKeys.includes(e.key)) {
+      pressedKeys[e.key as keyof SupportedKeys] = true;
+    }
+  })
+
+  window.addEventListener('keyup', (e) => {
+    if (allowedKeys.includes(e.key)) {
+      pressedKeys[e.key as keyof SupportedKeys] = false;
+    }
+  })
 }
 
 
-export const runGame = ({ ctx }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }) => {
-  renderFrame({ ctx });
+export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }) => {
+  canvas = gameCanvas;
+  ctx = gameCtx;
+
+  renderFrame();
+  initEventListeners();
 };
