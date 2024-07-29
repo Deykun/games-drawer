@@ -6,6 +6,8 @@ import { SupportedKeys } from './types'
 export class Player {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  prevX: number;
+  prevY: number;
   x: number;
   y: number;
   speed: number;
@@ -15,6 +17,8 @@ export class Player {
   constructor ({ canvas, ctx, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number }) {
     this.canvas = canvas;
     this.ctx = ctx;
+    this.prevX = x;
+    this.prevY = y;
     this.x = x;
     this.y = y;
     this.speed = 1;
@@ -30,6 +34,9 @@ export class Player {
   }
 
   move(pressedKeys: SupportedKeys) {
+    this.prevX = this.x;
+    this.prevY = this.y;
+
     if (pressedKeys.ArrowUp) {
       this.y -= this.speed;
     }
@@ -48,5 +55,10 @@ export class Player {
 
     this.x = clamp(0, this.x, this.canvas.width - this.width);
     this.y = clamp(0, this.y, this.canvas.height - this.height);
+  }
+
+  unstuck() {
+    this.x = this.prevX;
+    this.y = this.prevY;
   }
 }

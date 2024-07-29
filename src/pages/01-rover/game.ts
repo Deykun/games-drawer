@@ -1,9 +1,10 @@
 import { SupportedKeys } from './types'
+import { Wall } from './objects/wall'
 import { Player } from './objects/player'
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
-let player = undefined as Player | undefined;
+let player = undefined as unknown as Player;
 
 const pressedKeys: SupportedKeys = {
   ArrowUp: false,
@@ -29,8 +30,12 @@ const drawWorld = () => {
   world.forEach((row, rowIndex) => {
     row.forEach((cell, columnIndex) => {
       if (cell === 1) {
-        ctx.fillStyle = "red"
-        ctx.fillRect(tileWidth * columnIndex, tileHeight * rowIndex, tileHeight, tileWidth)
+        const wall = new Wall({ canvas, ctx, x: tileWidth * columnIndex, y: tileHeight * rowIndex });
+        wall.draw();
+        const didCollide = wall.isCollision(player);
+        if (didCollide) {
+          player.unstuck();
+        }
       } else {
         ctx.fillStyle = "green"
         ctx.fillRect(tileWidth * columnIndex, tileHeight * rowIndex, tileHeight, tileWidth)
