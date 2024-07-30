@@ -5,14 +5,11 @@ import { runGame } from './game';
 const Rover01 = () => {
   return (
       <>
-        <Canvas runGame={runGame} height={400} width={600} className="bg-[#c97e49] mx-auto" />
+        <Canvas runGame={runGame} height={400} width={600} className="bg-[#5eb22d] mx-auto" />
         <details className="mt-10">
           <summary>What works?</summary>
           <ul className="list-disc ml-10">
-            <li>Isometric movement.</li>
-            <li>Swapping image to match direction.</li>
-            <li>Collision detection.</li>
-            <li>The acceleration of the rover.</li>
+            <li>Isometric rendering.</li>
           </ul>
         </details>
       </>
