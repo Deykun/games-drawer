@@ -2,9 +2,13 @@ import Image0001 from '../assets/0001.png';
 import Image0011 from '../assets/0011.png';
 import Image0100 from '../assets/0100.png';
 import Image0110 from '../assets/0110.png';
+import Image0111 from '../assets/0111.png';
 import Image1000 from '../assets/1000.png';
 import Image1001 from '../assets/1001.png';
+import Image1011 from '../assets/1011.png';
 import Image1100 from '../assets/1100.png';
+import Image1101 from '../assets/1101.png';
+import Image1110 from '../assets/1110.png';
 import Image1111 from '../assets/1111.png';
 
 const BlockByType: {
@@ -14,9 +18,13 @@ const BlockByType: {
   '0011': Image0011,
   '0100': Image0100,
   '0110': Image0110,
+  '0111': Image0111,
   '1000': Image1000,
   '1001': Image1001,
+  '1011': Image1011,
   '1100': Image1100,
+  '1101': Image1101,
+  '1110': Image1110,
   '1111': Image1111,
 }
 
