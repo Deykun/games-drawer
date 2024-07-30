@@ -10,6 +10,7 @@ const Rover01 = () => {
           <summary>What works?</summary>
           <ul className="list-disc ml-10">
             <li>Isometric rendering.</li>
+            <li>Detecting clicked block.</li>
           </ul>
         </details>
       </>
