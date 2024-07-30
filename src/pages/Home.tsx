@@ -1,7 +1,11 @@
+import { Link } from "wouter";
+
 const Home = () => {
     return (
         <>
-          <h1>Home</h1>
+          <ol>
+            <li><Link to="/games-drawer/rover" className="text-lg text-blue-700">Rover</Link></li>
+          </ol>
         </>
     )
 }

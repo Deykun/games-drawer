@@ -1,6 +1,8 @@
 import { SupportedKeys } from './types'
 import { Wall } from './objects/wall'
 import { Player } from './objects/player'
+import ImageBackground from './assets/background.png';
+import ImageForeground from './assets/foreground.png';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
@@ -15,33 +17,35 @@ const pressedKeys: SupportedKeys = {
 
 const allowedKeys = Object.keys(pressedKeys);
 
-const world = [
-  [1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 1],
-  [1, 0, 2, 0, 0],
-  [1, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1],
+const mapWalls: { x: number, y: number, height: number, width: number }[] = [
+  { x: 20, y: 20, width: 10, height: 10 },
+  { x: 180, y: 0, width: 40, height: 20 },
+  { x: 210, y: 10, width: 30, height: 40 },
+  { x: 280, y: 55, width: 20, height: 20 },
+  { x: 295, y: 55, width: 40, height: 30 },
+  { x: 264, y: 105, width: 10, height: 10 },
 ];
 
-const tileHeight = 60;
-const tileWidth = 60;
+const drawBackground = () => {
+  const image = new Image();
+  image.src = ImageBackground;
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-const drawWorld = () => {
-  world.forEach((row, rowIndex) => {
-    row.forEach((cell, columnIndex) => {
-      if (cell === 1) {
-        const wall = new Wall({ canvas, ctx, x: tileWidth * columnIndex, y: tileHeight * rowIndex });
-        wall.draw();
-        const didCollide = wall.isCollision(player);
-        if (didCollide) {
-          player.unstuck();
-        }
-      } else {
-        ctx.fillStyle = "green"
-        ctx.fillRect(tileWidth * columnIndex, tileHeight * rowIndex, tileHeight, tileWidth)
+  mapWalls.forEach((mapWalls) => {
+      const wall = new Wall({ canvas, ctx, ...mapWalls });
+      wall.draw();
+      const didCollide = wall.isCollision(player);
+
+      if (didCollide) {
+        player.unstuck();
       }
-    });
   })
+}
+
+const drawForeground = () => {
+  const image = new Image();
+  image.src = ImageForeground;
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 }
 
 const drawPlayer = () => {
@@ -56,8 +60,9 @@ const drawPlayer = () => {
 const renderFrame = () => {
   window.requestAnimationFrame(renderFrame);
 
-  drawWorld();
+  drawBackground();
   drawPlayer();
+  drawForeground();
 }
 
 const initEventListeners = () => {
@@ -78,6 +83,8 @@ const initEventListeners = () => {
 export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }) => {
   canvas = gameCanvas;
   ctx = gameCtx;
+  ctx.imageSmoothingEnabled = false;
+
 
   renderFrame();
   initEventListeners();
