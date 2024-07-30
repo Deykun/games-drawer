@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, memo } from 'react';
 
 type Props = {
   className?: string,
@@ -27,4 +27,4 @@ const Canvas = ({ className, height = 400, width = 700, runGame }: Props) => {
   );
 }
 
-export default Canvas
+export default memo(Canvas)

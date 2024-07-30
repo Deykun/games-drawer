@@ -1,3 +1,5 @@
+import { IsometricObject, scaleFactor } from './meta/isometric_object';
+
 import Image0001 from '../assets/0001.png';
 import Image0010 from '../assets/0010.png';
 import Image0011 from '../assets/0011.png';
@@ -32,48 +34,20 @@ const BlockByType: {
 
 export const BlockTypes = Object.keys(BlockByType) as string[];
 
-const maxZ = 5;
-
-const topPadding = 20;
-const leftPadding = 50;
-
-const tileWidth = 16;
-const tileHeight = 8;
-const scaleFactor = 3;
-
-export class Block {
+export class Block extends IsometricObject {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   type: string;
-  x: number;
-  y: number;
-  position: {
-    x: number
-    y: number
-    z: number
-  };
   renderIndex: number;
-  height: number;
-  width: number;
   image?: HTMLImageElement;
 
   constructor ({ canvas, ctx, type, z, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: string, z: number, x: number, y: number}) {
+    super({ z, x, y });
+
     this.canvas = canvas;
     this.ctx = ctx;
     this.type = type;
-    this.position = {
-      x,
-      y,
-      z,
-    };
     this.renderIndex = (1000 * z) + (10 * y) + x;
-    this.x = tileWidth * x * scaleFactor + leftPadding;
-    if (y % 2 === 1) {
-      this.x = this.x + ((tileWidth * scaleFactor) / 2)
-    }
-    this.y = topPadding + Math.floor(tileHeight * y * scaleFactor / 2) + ((maxZ - z) * tileHeight * scaleFactor);
-    this.height = 17 * scaleFactor;
-    this.width = 16 * scaleFactor;
   }
 
   draw() {

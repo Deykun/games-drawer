@@ -1,109 +1,93 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
+import { defaultMap } from './const/map'
 import { Block, BlockTypes } from './objects/block'
+import { Pointer } from './objects/pointer'
 
-const objects: Block[] = [];
+let objects: Block[] = [];
+let pointer: Pointer | undefined = undefined;
 
 type ActionModes = 'random' | 'rotate' | 'remove' | 'build';
 let activeMode: ActionModes = 'random';
 
-
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
 
-const mapLayers: string[][][] = [
-  [
-    ['0000', '0000', '1001'],
-  ],
-  [
-    ['0000', '0000', '1111'],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    ['0000', '0000', '0000', '0000', '0000', '0000', '0000', '0000', '0110'],
-  ],
-  [
-    ['0000', '0000', '1111'],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    ['0000', '0000', '0000', '0000', '0000', '0000', '0000', '0000', '1111'],
-  ],
-  [
-    ['0000', '0100', '1111', '1111', '0001', '0100', '1111', '0001', '0000', '0000'],
-    ['0000', '1100', '1111', '1001', '0000', '1100', '1001', '0000', '0000', '0000'],
-    ['0000', '0000', '1100', '1001', '0000', '0000', '1000', '0000', '0000', '0000'],
-    ['0000', '0000', '1000', '0000', '0000', '0000', '0000', '0000', '0000', '0000'],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    ['0000', '0000', '0000', '0000', '0000', '0000', '0000', '0000', '1111'],
-  ],
-  [
-    ['0000', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1011'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '0001'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1011'],
-    ['1100', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '0001'],
-    ['1100', '1111', '1111', '1111', '1111', '1111', '1111', '1001'],
-    ['0000', '1100', '1101', '1101', '1101', '1101', '1101', '1001'],
-    ['0000', '1000', '1000', '1000', '1000', '1000', '1000', '0000'],
-    [],
-    [],
-    [],
-    ['0000', '0000', '0000', '0000', '0000', '0000', '0000', '0000', '1111'],
-  ],
-  [
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1101', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1011', '1110', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '0111', '1111', '1111', '1111', '1111', '1111'],
-    ['1111', '1111', '1111', '1111', '1111', '1101', '1101', '1101', '1101', '1001'],
-    ['0000', '0000', '0000', '0000', '0000', '1000', '1000', '1000', '1000', '1000'],
-  ]
-].reverse();
+const setMap = (map: string[][][]) => {
+  objects = [];
+
+  map.forEach((z, zIndex) => {
+    z.forEach((y, yIndex) => {
+      y.forEach((type, xIndex) => {
+        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
+
+        objects.push(object);
+      });
+    });
+  });
+}
 
 const drawMap = () => {
   objects.forEach((object) => {
     object.draw();
   });
+
+  if (pointer) {
+    pointer.draw()
+  }
 }
 
+const fps = 25;
 const renderFrame = () => {
-  window.requestAnimationFrame(renderFrame);
+  setTimeout(() => {
+    window.requestAnimationFrame(renderFrame);
+  }, 1000 / fps);
+
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawMap();
 }
 
 const initEventListeners = () => {
+  canvas.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const clickedObjectIndex = objects.findLastIndex((object) => object.wasClicked({ x, y }));
+    const clickedObject = objects[clickedObjectIndex];
+
+    if (clickedObject) {
+      const position = clickedObject.position;
+      const newPosition = {
+        ...position,
+        z: position.z + 1
+      };
+
+      const isBlocked = objects.some((object) => !(object.position.z !== newPosition.z || object.position.y !== newPosition.y  || object.position.x !== newPosition.x));
+
+      if (isBlocked) {
+        pointer = undefined;
+
+        return;
+      }
+
+      if (!pointer) {
+        pointer = new Pointer({ canvas, ctx, ...newPosition });
+
+        return;
+      }
+
+      pointer.move(newPosition);
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    if (pointer) {
+      pointer = undefined;
+    }
+  });
+
   canvas.addEventListener('click', (event) => {
     const rect = canvas.getBoundingClientRect()
     const x = event.clientX - rect.left;
@@ -135,7 +119,7 @@ const initEventListeners = () => {
         const isBlocked = objects.some((object) => !(object.position.z !== newPosition.z || object.position.y !== newPosition.y  || object.position.x !== newPosition.x));
 
         if (!isBlocked) {
-          const object = new Block({ canvas, ctx, type: '1111', ...position, z: position.z + 1 });
+          const object = new Block({ canvas, ctx, type: '1111', ...newPosition });
 
           objects.push(object);
 
@@ -153,15 +137,7 @@ export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanv
   ctx = gameCtx;
   ctx.imageSmoothingEnabled = false;
 
-  mapLayers.forEach((z, zIndex) => {
-    z.forEach((y, yIndex) => {
-      y.forEach((type, xIndex) => {
-        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
-
-        objects.push(object);
-      });
-    });
-  });
+  setMap(defaultMap);
 
   drawMap();
   renderFrame();
@@ -173,10 +149,15 @@ export const useControls = () => {
 
   useEffect(() => {
     activeMode = activeAction;
-  }, [activeAction])
+  }, [activeAction]);
+
+  const setGameMap = useCallback((map: string[][][]) => {
+    setMap(map);
+  }, []);
 
   return {
     activeAction,
     setActionMode,
+    setGameMap,
   }
 };

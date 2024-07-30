@@ -2,10 +2,11 @@ import clsx from 'clsx';
 
 import Canvas from '../../app/Canvas'
 
+import { defaultMap, flatMap } from './const/map';
 import { runGame, useControls } from './game';
 
 const Rover01 = () => {
-  const { activeAction, setActionMode } = useControls();
+  const { activeAction, setActionMode, setGameMap } = useControls();
 
   return (
       <>
@@ -15,6 +16,9 @@ const Rover01 = () => {
           <button onClick={() => setActionMode('random')} className={clsx({ 'font-bold': activeAction === 'random' })}>Random</button>
           <button onClick={() => setActionMode('remove')} className={clsx({ 'font-bold': activeAction === 'remove' })}>Remove</button>
           <button onClick={() => setActionMode('build')} className={clsx({ 'font-bold': activeAction === 'build' })}>Build</button>
+          <button onClick={() => setGameMap(defaultMap)} className="ml-auto">Default map</button>
+          <button onClick={() => setGameMap(flatMap)}>Flat map</button>
+          
         </div>
         <details className="mt-10">
           <summary>What works?</summary>
