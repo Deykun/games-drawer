@@ -75,7 +75,7 @@ export class Player {
       }
 
       this.y -= this.currentSpeed;
-      this.x -= this.currentSpeed;
+      this.x -= this.currentSpeed * 1.5;
       this.direction = 'y'
     }
 
@@ -85,7 +85,7 @@ export class Player {
       }
 
       this.y += this.currentSpeed;
-      this.x += this.currentSpeed;
+      this.x += this.currentSpeed  * 1.5;
       this.direction = 'y'
     }
 
@@ -97,7 +97,7 @@ export class Player {
         }
 
         this.y += this.currentSpeed;
-        this.x -= this.currentSpeed;
+        this.x -= this.currentSpeed  * 1.5;
         this.direction = 'x'
       }
   
@@ -107,7 +107,7 @@ export class Player {
         }
 
         this.y -= this.currentSpeed;
-        this.x += this.currentSpeed;
+        this.x += this.currentSpeed * 1.5;
         this.direction = 'x'
       }
     }
