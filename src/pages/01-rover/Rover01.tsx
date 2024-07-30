@@ -5,7 +5,7 @@ import { runGame } from './game';
 const Rover01 = () => {
   return (
       <>
-        <Canvas runGame={runGame} height={400} width={600} className="bg-[#ffb78c] mx-auto" />
+        <Canvas runGame={runGame} height={400} width={600} className="bg-[#c97e49] mx-auto" />
 
         <details className="mt-10">
           <summary>What works?</summary>
