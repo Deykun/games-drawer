@@ -5,7 +5,7 @@ const App = () => {
   return (
     <>
       <Header />
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="max-w-screen-xl mx-auto p-4">
         <Routes />
       </div>
     </>
