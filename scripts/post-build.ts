@@ -12,9 +12,9 @@ const PATHS_TO_ADD_TO_SSR = [
     social: `<meta property="og:title" content="🟩 Blocks" ><meta property="og:image" content="https://deykun.github.io/games-drawer/social/blocks.png" >`
   },
   {
-    path: 'gecko',
-    title: '🦎 Gecko',
-    social: `<meta property="og:title" content="🦎 Gecko" ><meta property="og:image" content="https://deykun.github.io/games-drawer/social/blocks.png" >`
+    path: 'gekko',
+    title: '🦎 Gekko',
+    social: `<meta property="og:title" content="🦎 Gekko" ><meta property="og:image" content="https://deykun.github.io/games-drawer/social/gekko.png" >`
   },
 ];
 

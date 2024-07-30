@@ -4,7 +4,7 @@ import PlayerImageWalkRight from '../assets/walk-right.png'
 
 import { SupportedKeys } from '../types'
 
-const scaleFactor = 5;
+const scaleFactor = 3;
 
 const PLAYER_STATES = {
   default: 'default',
@@ -20,6 +20,10 @@ export class Player {
   animationFrame: number;
   x: number;
   y: number;
+  speed: {
+    x: number;
+    y: number;
+  };
   direction: 'left' | 'right';
   height: number;
   width: number;
@@ -35,6 +39,10 @@ export class Player {
     this.prevX = x;
     this.prevY = y;
     this.direction = 'right';
+    this.speed = {
+      x: 0,
+      y: 0,
+    };
     this.x = x;
     this.y = y;
     this.height = 12;
@@ -106,12 +114,25 @@ export class Player {
         this.animationFrame += 1;
       }
 
+      if (pressedKeys.ArrowLeft) {
+        this.speed.x = this.speed.x - 0.5;
+      }
+  
+      if (pressedKeys.ArrowRight) {
+        this.speed.x = this.speed.x + 0.5;
+      }
+
       this.prevTime = (new Date().getTime());
     }
 
     if (!isMovingX) {
       this.state = PLAYER_STATES.default;
-      this.animationFrame = 0;
+      
+      if (this.speed.x) {
+        this.x += this.speed.x;
+
+        this.speed.x = 0.05 * this.speed.x;
+      }
   
       return;
     }
@@ -121,23 +142,19 @@ export class Player {
     const maxX = this.canvas.width - this.width * scaleFactor;
     const maxY = this.canvas.height - this.height * scaleFactor;
 
-    console.log(pressedKeys)
-    console.log({
-      maxX,
-      maxY,
-    })
 
     if (pressedKeys.ArrowLeft) {
-      this.x -= 3;
+      this.x = this.x - 3 + this.speed.x;
       this.direction = 'left';
     }
 
     if (pressedKeys.ArrowRight) {
-      this.x += 3;
+      this.x = this.x + 3 + this.speed.x;
       this.direction = 'right';
     }
 
     this.x = clamp(0, this.x, maxX);
     this.y = clamp(0, this.y, maxY);
+    this.speed.x = clamp(-4, this.speed.x, 4);
   }
 }
