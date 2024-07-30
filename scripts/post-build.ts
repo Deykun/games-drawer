@@ -1,9 +1,13 @@
 import fs from 'fs';
 
-const PATHS_TO_ADD_TO_SSR = ['rover'];
+const PATHS_TO_ADD_TO_SSR = [
+  { path: 'rover', title: 'Rover' },
+];
 
-PATHS_TO_ADD_TO_SSR.forEach((path) => {
-  const html = fs.readFileSync('./dist/index.html', 'utf-8');
+PATHS_TO_ADD_TO_SSR.forEach(({ path, title }) => {
+  let html = fs.readFileSync('./dist/index.html', 'utf-8');
+
+  html = html.replace('<title>', `<title>${title} -`);
 
   fs.writeFileSync(`./dist/${path}.html`, html);
 });
