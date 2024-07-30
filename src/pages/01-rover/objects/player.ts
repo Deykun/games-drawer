@@ -48,7 +48,7 @@ export class Player {
     this.prevY = this.y;
 
     const isMovingY = [pressedKeys.ArrowUp, pressedKeys.ArrowDown].filter(Boolean).length;
-    const isMovingX = [pressedKeys.ArrowLeft, pressedKeys.ArrowRight].filter(Boolean).length; 
+    const isMovingX = [pressedKeys.ArrowLeft, pressedKeys.ArrowRight].filter(Boolean).length;
     const isMoving = isMovingY || isMovingX;
 
     const timeDiffrenceInMs = (new Date().getTime()) - this.prevTime;
