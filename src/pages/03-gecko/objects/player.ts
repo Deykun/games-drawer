@@ -17,6 +17,7 @@ export class Player {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   state: TYPE_PLAYER_STTES;
+  animationFrame: number;
   x: number;
   y: number;
   direction: 'left' | 'right';
@@ -30,6 +31,7 @@ export class Player {
     this.canvas = canvas;
     this.ctx = ctx;
     this.state = PLAYER_STATES.default;
+    this.animationFrame = 0;
     this.prevX = x;
     this.prevY = y;
     this.direction = 'right';
@@ -59,12 +61,30 @@ export class Player {
     );
   }
 
+  drawWalking() {
+    const image = new Image();
+    image.src = this.direction === 'left' ? PlayerImageWalkLeft : PlayerImageWalkRight;
+
+    console.log('this.animationFrame', this.animationFrame)
+    if (this.animationFrame >= 6) {
+      this.animationFrame = 0;
+    }
+
+    this.drawFrame({ image, frame: this.animationFrame, x: this.x, y: this.y });
+  }
+
   draw() {
     if (this.state === PLAYER_STATES.default) {
       const image = new Image();
       image.src = this.direction === 'left' ? PlayerImageWalkLeft : PlayerImageWalkRight;
 
       this.drawFrame({ image, frame: 0, x: this.x, y: this.y });
+    
+      return;
+    }
+
+    if (this.state === PLAYER_STATES.walk) {
+      this.drawWalking();
     }
   }
 
@@ -77,12 +97,26 @@ export class Player {
     this.prevX = this.x;
     this.prevY = this.y;
 
-
-
     const isMovingX = [pressedKeys.ArrowLeft, pressedKeys.ArrowRight].filter(Boolean).length;
+
+
+    const timeDiffrenceInMs = (new Date().getTime()) - this.prevTime;
+    if (timeDiffrenceInMs > 100) {
+      if (isMovingX) {
+        this.animationFrame += 1;
+      }
+
+      this.prevTime = (new Date().getTime());
+    }
+
     if (!isMovingX) {
+      this.state = PLAYER_STATES.default;
+      this.animationFrame = 0;
+  
       return;
     }
+
+    this.state = PLAYER_STATES.walk;
 
     const maxX = this.canvas.width - this.width * scaleFactor;
     const maxY = this.canvas.height - this.height * scaleFactor;
@@ -94,12 +128,12 @@ export class Player {
     })
 
     if (pressedKeys.ArrowLeft) {
-      this.x -= 10;
+      this.x -= 3;
       this.direction = 'left';
     }
 
     if (pressedKeys.ArrowRight) {
-      this.x += 10;
+      this.x += 3;
       this.direction = 'right';
     }
 
