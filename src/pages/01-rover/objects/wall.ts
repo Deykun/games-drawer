@@ -26,8 +26,10 @@ export class Wall {
       return false;
     }
 
-    if (object.x < this.x + this.width && object.x + object.width > this.x && object.y < this.y + this.height && object.height + object.y > this.y) {
-      return true;
+    if (object.x > this.x + this.width || object.x + object.width < this.x || object.y > this.y + this.height || object.height + object.y < this.y) {
+      return false;
     }
+
+    return true;
   }
 }

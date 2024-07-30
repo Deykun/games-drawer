@@ -66,8 +66,8 @@ export class Player {
       return;
     }
 
-    const maxX = this.canvas.width - this.width;
-    const maxY = this.canvas.height - this.height;
+    const maxX = this.canvas.width - this.width * 2;
+    const maxY = this.canvas.height - this.height * 2;
 
     if (pressedKeys.ArrowUp) {
       if (this.y === 0 || this.x === 0) {
