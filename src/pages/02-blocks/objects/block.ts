@@ -28,6 +28,8 @@ const BlockByType: {
   '1111': Image1111,
 }
 
+export const BlockTypes = Object.keys(BlockByType) as string[];
+
 const maxZ = 5;
 
 const topPadding = 20;
@@ -45,6 +47,7 @@ export class Block {
   y: number;
   height: number;
   width: number;
+  image?: HTMLImageElement;
 
   constructor ({ canvas, ctx, type, z, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: string, z: number, x: number, y: number}) {
     this.canvas = canvas;
@@ -64,9 +67,42 @@ export class Block {
       return;
     }
   
-    const image = new Image();
-    image.src = BlockByType[this.type];
+    this.image = new Image();
+    this.image.src = BlockByType[this.type];
 
-    this.ctx.drawImage(image, this.x, this.y, this.width, this.height);
+    this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+  }
+
+  wasClicked(object?: { x: number, y: number }) {
+    if (!object || !this.image) {
+      return false;
+    }
+
+    if (object.x > this.x + this.width || object.x < this.x || object.y > this.y + this.height || object.y < this.y) {
+      return false;
+    }
+
+    const xInImage = object.x - this.x;
+    const yInImage = object.y - this.y;
+
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    canvas.width = this.width * scaleFactor;
+    canvas.height = this.height * scaleFactor;
+    var context = canvas.getContext("2d");
+    if (context) {
+      context.drawImage(this.image, 0, 0, this.width, this.height);
+      canvas.remove();
+  
+      return context.getImageData(xInImage, yInImage, 1, 1).data[3] > 0
+    }
+
+    canvas.remove();
+
+    return false;
+  }
+
+  changeType(type: string) {
+    this.type = type;
   }
 }

@@ -1,4 +1,7 @@
-import { Block } from './objects/block'
+import { getRandomItem } from '../../utils/math'
+import { Block, BlockTypes } from './objects/block'
+
+const objects: Block[] = [];
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
@@ -83,14 +86,9 @@ const mapLayers: string[][][] = [
 ].reverse();
 
 const drawMap = () => {
-  mapLayers.forEach((z, zIndex) => {
-    z.forEach((y, yIndex) => {
-      y.forEach((type, xIndex) => {
-        const block = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
-        block.draw();
-      });
-    });
-  })
+  objects.forEach((object) => {
+    object.draw();
+  });
 }
 
 const renderFrame = () => {
@@ -99,12 +97,35 @@ const renderFrame = () => {
   drawMap();
 }
 
+const initEventListeners = () => {
+  canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const clickedObject = objects.findLast((object) => object.wasClicked({ x, y }));
+
+    if (clickedObject) {
+      clickedObject.changeType(getRandomItem(BlockTypes) ?? '1111')
+    }
+  })
+}
 
 export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }) => {
   canvas = gameCanvas;
   ctx = gameCtx;
   ctx.imageSmoothingEnabled = false;
 
+  mapLayers.forEach((z, zIndex) => {
+    z.forEach((y, yIndex) => {
+      y.forEach((type, xIndex) => {
+        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
+
+        objects.push(object);
+      });
+    });
+  });
 
   renderFrame();
+  initEventListeners();
 };
