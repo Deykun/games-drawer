@@ -1,7 +1,12 @@
+import { useEffect, useState } from 'react';
 import { getRandomItem } from '../../utils/math'
 import { Block, BlockTypes } from './objects/block'
 
 const objects: Block[] = [];
+
+type ActionModes = 'random' | 'rotate' | 'remove' | 'build';
+let activeMode: ActionModes = 'random';
+
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
@@ -94,6 +99,7 @@ const drawMap = () => {
 const renderFrame = () => {
   window.requestAnimationFrame(renderFrame);
 
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawMap();
 }
 
@@ -103,10 +109,41 @@ const initEventListeners = () => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    const clickedObject = objects.findLast((object) => object.wasClicked({ x, y }));
+    const clickedObjectIndex = objects.findLastIndex((object) => object.wasClicked({ x, y }));
+    const clickedObject = objects[clickedObjectIndex];
 
     if (clickedObject) {
-      clickedObject.changeType(getRandomItem(BlockTypes) ?? '1111')
+      if (activeMode === 'rotate') {
+        clickedObject?.rotate();
+      }
+
+      if (activeMode === 'remove') {
+        objects.splice(clickedObjectIndex, 1);
+      }
+      
+      if (activeMode === 'random') {
+        clickedObject.changeType(getRandomItem(BlockTypes) ?? '1111')
+      }
+
+      if (activeMode === 'build') {
+        const position = clickedObject.position;
+        const newPosition = {
+          ...position,
+          z: position.z + 1
+        };
+
+        const isBlocked = objects.some((object) => !(object.position.z !== newPosition.z || object.position.y !== newPosition.y  || object.position.x !== newPosition.x));
+
+        if (!isBlocked) {
+          const object = new Block({ canvas, ctx, type: '1111', ...position, z: position.z + 1 });
+
+          objects.push(object);
+
+          objects.sort((a, b) => a.renderIndex - b.renderIndex);
+        }
+      }
+
+      renderFrame();
     }
   })
 }
@@ -126,6 +163,20 @@ export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanv
     });
   });
 
+  drawMap();
   renderFrame();
   initEventListeners();
+};
+
+export const useControls = () => {
+  const [activeAction, setActionMode] = useState(activeMode);
+
+  useEffect(() => {
+    activeMode = activeAction;
+  }, [activeAction])
+
+  return {
+    activeAction,
+    setActionMode,
+  }
 };
