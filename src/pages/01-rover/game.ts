@@ -79,12 +79,10 @@ const initEventListeners = () => {
   })
 }
 
-
 export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }) => {
   canvas = gameCanvas;
   ctx = gameCtx;
   ctx.imageSmoothingEnabled = false;
-
 
   renderFrame();
   initEventListeners();

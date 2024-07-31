@@ -1,30 +1,11 @@
 import fs from 'fs';
+import { PATHS_DATA } from '../src/constants';
 
-const PATHS_TO_ADD_TO_SSR = [
-  {
-    path: 'rover',
-    title: '🌕 Rover',
-    social: `<meta property="og:title" content="🌕 Rover" ><meta property="og:image" content="https://deykun.github.io/games-drawer/social/rover.png" >`
-  },
-  {
-    path: 'blocks',
-    title: '🟩 Blocks',
-    social: `<meta property="og:title" content="🟩 Blocks" ><meta property="og:image" content="https://deykun.github.io/games-drawer/social/blocks.png" >`
-  },
-  {
-    path: 'gekko',
-    title: '🦎 Gekko',
-    social: `<meta property="og:title" content="🦎 Gekko" ><meta property="og:image" content="https://deykun.github.io/games-drawer/social/gekko.png" >`
-  },
-];
-
-PATHS_TO_ADD_TO_SSR.forEach(({ path, title, social }) => {
+PATHS_DATA.forEach(({ path, title, social }) => {
   let html = fs.readFileSync('./dist/index.html', 'utf-8');
 
   html = html.replace('<title>', `<title>${title} - `);
   html = html.replace('<!-- SOCIAL -->', social);
-
-  
 
   fs.writeFileSync(`./dist/${path}.html`, html);
 });
