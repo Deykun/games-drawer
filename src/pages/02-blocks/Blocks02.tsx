@@ -2,10 +2,10 @@ import clsx from 'clsx';
 
 import Canvas from '../../app/Canvas'
 
-import { defaultMap, flatMap } from './const/map';
+import { defaultMap, flatMap } from './constants';
 import { runGame, useControls } from './game';
 
-const Rover01 = () => {
+const Blocks02 = () => {
   const { activeAction, setActionMode, setGameMap } = useControls();
 
   return (
@@ -31,4 +31,4 @@ const Rover01 = () => {
   );
 };
 
-export default Rover01;
+export default Blocks02;

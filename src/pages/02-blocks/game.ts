@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
-import { defaultMap } from './const/map'
+import { defaultMap } from './constants'
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 

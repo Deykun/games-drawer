@@ -7,5 +7,10 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@*": ["./script/*", "./src/*", "./src/*/index"],
+    }
+  },
 }
