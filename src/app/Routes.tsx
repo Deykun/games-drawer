@@ -13,8 +13,6 @@ import { useMemo } from "react";
 const Routes = () => {
   const [path] = useLocation();
 
-  console.log('path', path);
-
   const title = useMemo(() => {
     const pathToCompare = path.replace('/games-drawer/', '');
     const pathData = PATHS_DATA.find(({ path: itemPath }) => pathToCompare === itemPath);

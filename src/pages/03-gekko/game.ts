@@ -31,14 +31,17 @@ const drawPlayer = () => {
   player.draw();
 
   levelLayout.forEach((object) => {
-    const didCollide = object.isCollision(player);
+    const { isCollision, didFall, didHitWall, x, y } = object.checkCollision(player);
 
-    if (didCollide) {
-      player.unstuck();
+    if (isCollision) {
+      player.unstuck({
+        didFall, didHitWall, x, y,
+      });
     }
-  })
+  });
 
   player.move(pressedKeys)
+
 }
 
 const renderFrame = () => {

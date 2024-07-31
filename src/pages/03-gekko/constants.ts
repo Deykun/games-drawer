@@ -1,6 +1,7 @@
-export const scaleFactor = 3;
+export const scaleFactor = 5;
 
-export const gravity = 10;
+export const gravity = 15;
+export const jumpPower = -10;
 
 type PointX = {
   x: number,
@@ -32,4 +33,5 @@ export const level1: LevelPoint[] = [
   { x: 0, y: 0, width: 20, height: 'max' },
   { x: 'max', y: 0, width: 20, height: 'max' },
   { x: 0, y: 'max', width: 'max', height: 20 },
+  { x: 0, y: 350, width: 150, height: 50 },
 ];
