@@ -21,36 +21,50 @@ export class Platform {
   draw() {
     this.ctx.fillStyle = this.color;
     this.ctx.fillRect(this.x, this.y, this.width, this.height)
+    // this.ctx.textBaseline = "top";
+    // this.ctx.fillStyle = 'white';
+    // this.ctx.fillText(`${this.width}x${this.height}`, this.x, this.y);
   }
 
-  checkCollision(object?: { x: number, y: number, height: number, width: number}) {
+  didCollide(object?: { x: number, y: number, prevY: number, dy: number, height: number, width: number }) {
     this.color = "#505040";
-
+  
     if (!object) {
-      return { isCollision: false };
+      return false;
     }
 
-    const isObjectAbove = object.y > this.y + this.height;
-    const isObjectOnLeft = object.x + object.width < this.x;
-    const isObjectOnRight = object.x > this.x + this.width;
-    const isObjectBelow =  object.y + object.height < this.y;
+    const isInRangeOfX = object.x + object.width >= this.x && object.x <= this.x + this.width;
+    const isInRangeOfY = object.y + object.height >= this.y && object.y <= this.y + this.height;
 
-    const wasCollisionAvoided = isObjectAbove || isObjectOnLeft || isObjectOnRight || isObjectBelow;
+    const wasCollisionAvoided = !isInRangeOfX || !isInRangeOfY;
     if (wasCollisionAvoided) {
+      return false;
+    }
+
+    return true;
+  }
+
+  checkCollision(object?: { x: number, y: number, prevX: number, prevY: number, dx: number, dy: number, height: number, width: number }) {
+    const didCollide = this.didCollide(object);
+    if (!object || !didCollide) {
       return { isCollision: false };
     }
 
     this.color = '#23291d';
 
-    // const percentageAbove = 0.8;
+    const isInRangeOfX = object.x + object.width >= this.x && object.x <= this.x + this.width;
+    const wasInRangeOfX = object.prevX >= this.x && object.prevX <= this.x + this.width;
+
+    const didHitFromBelow = isInRangeOfX && wasInRangeOfX && object.y <= this.y + this.height && object.prevY > this.y + this.height;
+
     const fallThreshold = gravity + 1;
-    const didFall = object.y < this.y && object.y + (object.width - fallThreshold) < this.y;
-    const didHitFromBelow = object.y > this.y
+    const didFall = !didHitFromBelow && object.y < this.y && object.y + (object.height - fallThreshold) < this.y;
     
     const isWallOnLeft = !didFall && object.x > this.x;
     const isWallOnRight = !didFall && object.x < this.x;
 
     const didHitWall = isWallOnLeft || isWallOnRight;
+
 
     let x, y;
     if (didFall) {
@@ -64,7 +78,12 @@ export class Platform {
         x = this.x + this.width;
       }
     }
+    
+    if (didHitFromBelow) {
+      y = object.y - object.dy;
+      x = object.x - object.dx;
+    }
 
-    return { isCollision: true, didFall, didHitWall, x, y };
+    return { isCollision: true, didFall, didHitFromBelow, didHitWall, x, y };
   }
 }

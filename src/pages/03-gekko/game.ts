@@ -25,30 +25,32 @@ const drawLevel = () => {
 
 const drawPlayer = () => {
   if (!player) {
-    player = new Player({ canvas, ctx, x: 100, y: 250 });
+    player = new Player({ canvas, ctx, x: 50, y: 100 });
   }
-
-
   
   player.move(pressedKeys)
 
-  const collisions = levelLayout.map((object) => {
-    const collisionSummary = object.checkCollision(player);
-
-    return collisionSummary.isCollision ? collisionSummary : undefined;
+  const collidedObjects = levelLayout.filter((object) => {
+    return object.didCollide(player);
   }).filter(Boolean);
 
-  if (player.state !== PLAYER_STATES.air) {
-    const isFallingButNotInAir = !collisions.some((collision) => collision?.didFall);
 
-    if (isFallingButNotInAir) {
-      player.setState(PLAYER_STATES.air);
+  let isFalling = false;
+  collidedObjects.forEach((object) => {
+    const collision = object.checkCollision(player);
+
+    if (collision.didFall) {
+      isFalling = true;
     }
-  }
 
-  collisions.forEach((collision) => {
-    player.unstuck(collision);
-  })
+    if (collision.isCollision) {
+      player.unstuck(collision);
+    }
+  });
+
+  if (!isFalling && player.state !== PLAYER_STATES.air) {
+    player.setState(PLAYER_STATES.air);
+  }
 
   player.draw();
 }

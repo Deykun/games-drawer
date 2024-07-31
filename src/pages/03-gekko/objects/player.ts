@@ -106,7 +106,7 @@ export class Player {
   unstuck({ x, y, didFall = false, didHitFromBelow = false, didHitWall = false }: { x?: number, y?: number, didFall?: boolean, didHitFromBelow?: boolean, didHitWall?: boolean } = {}) {
     if (didHitWall) {
       this.x = x ?? this.prevX;
-      this.dx = 0;
+      this.dx = -this.dx;
     }
 
     if (didFall || didHitFromBelow) {
@@ -122,15 +122,6 @@ export class Player {
   move(pressedKeys: SupportedKeys) {
     this.prevX = this.x;
     this.prevY = this.y;
-
-
-    console.log(JSON.stringify({
-      x: this.x,
-      y: this.y,
-      dx: this.dx,
-      dy: this.dy,
-      state: this.state,
-    }));
 
     const isMovingX = [pressedKeys.ArrowLeft, pressedKeys.ArrowRight].filter(Boolean).length;
 
