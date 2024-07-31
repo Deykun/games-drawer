@@ -1,4 +1,4 @@
-import { clamp } from '../../../utils/math';
+import { clamp, round } from '../../../utils/math';
 import PlayerImageWalkLeft from '../assets/walk-left.png'
 import PlayerImageWalkRight from '../assets/walk-right.png'
 
@@ -10,7 +10,7 @@ const PLAYER_ANIMATIONS = {
   walk: 'walk',
 } as const;
 
-const PLAYER_STATES = {
+export const PLAYER_STATES = {
   default: 'default',
   air: 'air',
 } as const;
@@ -51,6 +51,10 @@ export class Player {
     this.height = 12 * scaleFactor;
     this.width = 10 * scaleFactor;
     this.prevTime = (new Date().getTime());
+  }
+
+  setState(state: TypePlayerStates) {
+    this.state = state;
   }
 
   drawFrame({ image, frame = 0, x, y }: { image: HTMLImageElement, frame: number, x: number, y: number}) {
@@ -99,16 +103,18 @@ export class Player {
     }
   }
 
-  unstuck({ x, y, didFall = false, didHitWall = false }: { x?: number, y?: number, didFall?: boolean, didHitWall?: boolean } = {}) {
+  unstuck({ x, y, didFall = false, didHitFromBelow = false, didHitWall = false }: { x?: number, y?: number, didFall?: boolean, didHitFromBelow?: boolean, didHitWall?: boolean } = {}) {
     if (didHitWall) {
       this.x = x ?? this.prevX;
+      this.dx = -this.dx;
+    }
+
+    if (didFall || didHitFromBelow) {
+      this.y = y ?? this.prevY;
       this.dy = gravity;
-      this.state = PLAYER_STATES.default;
     }
 
     if (didFall) {
-      this.y = y ?? this.prevY;
-      this.dx = 0;
       this.state = PLAYER_STATES.default;
     }
   }
@@ -139,11 +145,11 @@ export class Player {
       }
 
       if (pressedKeys.ArrowLeft) {
-        this.dx = this.dx - 0.5; 
+        this.dx = this.dx - 3; 
       }
   
       if (pressedKeys.ArrowRight) {
-        this.dx = this.dx + 0.5;
+        this.dx = this.dx + 3;
       }
 
       this.prevTime = (new Date().getTime());
@@ -174,9 +180,9 @@ export class Player {
     const maxX = this.canvas.width - this.width;
     const maxY = this.canvas.height - this.height;
 
-    this.x = clamp(0, this.x, maxX);
-    this.y = clamp(0, this.y, maxY);
-    this.dx = clamp(-4, this.dx, 4);
-    this.dy = clamp(jumpPower, this.dy, gravity);
+    this.x = round(clamp(0, this.x, maxX), 1);
+    this.y = round(clamp(0, this.y, maxY), 1);
+    this.dx = round(clamp(-4, this.dx, 4), 1);
+    this.dy = round(clamp(jumpPower, this.dy, gravity), 1);
   }
 }

@@ -1,7 +1,7 @@
 import { SupportedKeys } from './types'
 import { level1 } from './constants';
 import { Platform } from './objects/platform'
-import { Player } from './objects/player'
+import { Player, PLAYER_STATES } from './objects/player'
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
@@ -25,23 +25,34 @@ const drawLevel = () => {
 
 const drawPlayer = () => {
   if (!player) {
-    player = new Player({ canvas, ctx, x: 100, y: 250 });
+    player = new Player({ canvas, ctx, x: 50, y: 100 });
   }
+  
+  player.move(pressedKeys)
 
-  player.draw();
+  const collidedObjects = levelLayout.filter((object) => {
+    return object.didCollide(player);
+  }).filter(Boolean);
 
-  levelLayout.forEach((object) => {
-    const { isCollision, didFall, didHitWall, x, y } = object.checkCollision(player);
 
-    if (isCollision) {
-      player.unstuck({
-        didFall, didHitWall, x, y,
-      });
+  let isFalling = false;
+  collidedObjects.forEach((object) => {
+    const collision = object.checkCollision(player);
+
+    if (collision.didFall) {
+      isFalling = true;
+    }
+
+    if (collision.isCollision) {
+      player.unstuck(collision);
     }
   });
 
-  player.move(pressedKeys)
+  if (!isFalling && player.state !== PLAYER_STATES.air) {
+    player.setState(PLAYER_STATES.air);
+  }
 
+  player.draw();
 }
 
 const renderFrame = () => {
