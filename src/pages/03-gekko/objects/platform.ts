@@ -1,5 +1,4 @@
 import { gravity } from '../constants';
-
 export class Platform {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -43,7 +42,10 @@ export class Platform {
 
     this.color = '#23291d';
 
-    const didFall = object.y < this.y;
+    // const percentageAbove = 0.8;
+    const fallThreshold = gravity + 1;
+    const didFall = object.y < this.y && object.y + (object.width - fallThreshold) < this.y;
+    const didHitFromBelow = object.y > this.y
     
     const isWallOnLeft = !didFall && object.x > this.x;
     const isWallOnRight = !didFall && object.x < this.x;
@@ -52,7 +54,7 @@ export class Platform {
 
     let x, y;
     if (didFall) {
-      y = this.y - object.height - gravity;
+      y = this.y - object.height;
     }
 
     if (didHitWall) {
