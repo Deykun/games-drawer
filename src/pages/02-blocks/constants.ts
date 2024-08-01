@@ -1,4 +1,4 @@
-export type ActionModes = 'random' | 'rotate' | 'remove' | 'build';
+export type ActionModes = 'random' | 'rotate' | 'remove' | 'build' | 'increase' | 'decrease';
 
 export const exampleMap: string[][][] = [
   [

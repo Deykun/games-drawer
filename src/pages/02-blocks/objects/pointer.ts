@@ -1,6 +1,8 @@
 import { IsometricObject } from './meta/isometric_object'
 import ImagePointer from '../assets/pointer.png';
 import ImagePointerBuild from '../assets/pointer-build.png';
+import ImagePointerDecrase from '../assets/pointer-decrease.png';
+import ImagePointerIncrase from '../assets/pointer-increase.png';
 import ImagePointerRemove from '../assets/pointer-remove.png';
 import ImagePointerRotate from '../assets/pointer-rotate.png';
 
@@ -10,6 +12,8 @@ const PointerByActiveMode: {
   [key: string]: string,
 } = {
   'build': ImagePointerBuild,
+  'decrease': ImagePointerDecrase,
+  'increase': ImagePointerIncrase,
   'remove': ImagePointerRemove,
   'rotate': ImagePointerRotate,
 }
