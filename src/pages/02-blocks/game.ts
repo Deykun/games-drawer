@@ -1,39 +1,47 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
-import { defaultMap } from './constants'
+import { defaultMap, ActionModes } from './constants'
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
-let objects: Block[] = [];
+let objectsByPosition: {
+  [location: string]: Block,
+} = {};
+let objectsSortedForRender: Block[] = [];
 let pointer: Pointer | undefined = undefined;
 
-type ActionModes = 'random' | 'rotate' | 'remove' | 'build';
 let activeMode: ActionModes = 'random';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
 
+const refreshObjectsForRender = () => {
+  objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
+}
+
 const setMap = (map: string[][][]) => {
-  objects = [];
+  objectsByPosition = {};
 
   map.forEach((z, zIndex) => {
     z.forEach((y, yIndex) => {
       y.forEach((type, xIndex) => {
         const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
 
-        objects.push(object);
+        objectsByPosition[`${xIndex}x${yIndex}x${zIndex}`] = object;
       });
     });
   });
+
+  refreshObjectsForRender();
 }
 
 const drawMap = () => {
-  objects.forEach((object) => {
+  objectsSortedForRender.forEach((object) => {
     object.draw();
-  });
+  })
 
   if (pointer) {
-    pointer.draw()
+    pointer.draw({ activeMode })
   }
 }
 
@@ -54,18 +62,18 @@ const initEventListeners = () => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    const clickedObjectIndex = objects.findLastIndex((object) => object.wasClicked({ x, y }));
-    const clickedObject = objects[clickedObjectIndex];
+    const hoveredObjectIndex = objectsSortedForRender.findLastIndex((object) => object.wasClicked({ x, y }));
+    const hoveredObject = objectsSortedForRender[hoveredObjectIndex];
 
-    if (clickedObject) {
-      const position = clickedObject.position;
+    if (hoveredObject) {
+      const position = hoveredObject.position;
       const newPosition = {
         ...position,
         z: position.z + 1
       };
 
-      const isBlocked = objects.some((object) => !(object.position.z !== newPosition.z || object.position.y !== newPosition.y  || object.position.x !== newPosition.x));
-
+      const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
+      const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
       if (isBlocked) {
         pointer = undefined;
 
@@ -93,16 +101,20 @@ const initEventListeners = () => {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    const clickedObjectIndex = objects.findLastIndex((object) => object.wasClicked({ x, y }));
-    const clickedObject = objects[clickedObjectIndex];
+    const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => object.wasClicked({ x, y }));
+    const clickedObject = objectsSortedForRender[clickedObjectIndex];
 
     if (clickedObject) {
       if (activeMode === 'rotate') {
         clickedObject?.rotate();
       }
 
+      const objectLocation = `${clickedObject.position.x}x${clickedObject.position.y}x${clickedObject.position.z}`;
+
       if (activeMode === 'remove') {
-        objects.splice(clickedObjectIndex, 1);
+        delete objectsByPosition[objectLocation];
+
+        refreshObjectsForRender();
       }
       
       if (activeMode === 'random') {
@@ -116,14 +128,14 @@ const initEventListeners = () => {
           z: position.z + 1
         };
 
-        const isBlocked = objects.some((object) => !(object.position.z !== newPosition.z || object.position.y !== newPosition.y  || object.position.x !== newPosition.x));
-
+        const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
+        const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
         if (!isBlocked) {
           const object = new Block({ canvas, ctx, type: '1111', ...newPosition });
 
-          objects.push(object);
+          objectsByPosition[objectAboveLocation] = object;
 
-          objects.sort((a, b) => a.renderIndex - b.renderIndex);
+          refreshObjectsForRender();
         }
       }
 

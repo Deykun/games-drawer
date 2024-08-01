@@ -68,7 +68,6 @@ export class Platform {
 
     const didHitWall = isWallOnLeft || isWallOnRight;
 
-
     let x, y;
     if (didFall) {
       y = this.y - object.height;

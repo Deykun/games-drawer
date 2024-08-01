@@ -59,6 +59,10 @@ export class Block extends IsometricObject {
     this.image.src = BlockByType[this.type];
 
     this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+
+    // this.ctx.textBaseline = "top";
+    // this.ctx.fillStyle = 'white';
+    // this.ctx.fillText(`${this.position.x},${this.position.y},${this.position.z}`, this.x, this.y);
   }
 
   wasClicked(object?: { x: number, y: number }) {

@@ -1,4 +1,6 @@
-export const defaultMap: string[][][] = [
+export type ActionModes = 'random' | 'rotate' | 'remove' | 'build';
+
+export const exampleMap: string[][][] = [
   [
     ['0000', '0000', '1001'],
   ],
@@ -95,3 +97,5 @@ export const flatMap: string[][][] = [
     ['1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111', '1111'],
   ],
 ].reverse();
+
+export const defaultMap = exampleMap;
