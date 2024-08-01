@@ -58,7 +58,6 @@ export class Player {
   }
 
   setPosition({ x, y }: { x?: number, y?: number } = {}) {
-    console.log('called')
     if (typeof x === 'number') {
       this.x = x;
     }
