@@ -1,13 +1,14 @@
 import { useRef, useEffect, memo } from 'react';
 
 type Props = {
+  id?: string,
   className?: string,
   height?: number,
   width?: number,
   runGame: ({ canvas, ctx }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }) => void,
 }
 
-const Canvas = ({ className, height = 400, width = 700, runGame }: Props) => {
+const Canvas = ({ id = 'canvas', className, height = 400, width = 700, runGame }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
@@ -23,7 +24,7 @@ const Canvas = ({ className, height = 400, width = 700, runGame }: Props) => {
   }, []);
 
   return (
-      <canvas ref={canvasRef} height={height} width={width} className={className} />
+      <canvas id={id} ref={canvasRef} height={height} width={width} className={className} />
   );
 }
 

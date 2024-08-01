@@ -1,5 +1,6 @@
+import { useCallback } from 'react';
 import { SupportedKeys } from './types'
-import { level1 } from './constants';
+import { LevelPoint, level1 } from './constants';
 import { Platform } from './objects/platform'
 import { Player, PLAYER_STATES } from './objects/player'
 
@@ -7,7 +8,7 @@ let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
 let player = undefined as unknown as Player;
 
-const levelLayout: Platform[] = [];
+let levelLayout: Platform[] = [];
 
 const pressedKeys: SupportedKeys = {
   Spacebar: false,
@@ -16,6 +17,21 @@ const pressedKeys: SupportedKeys = {
 };
 
 const allowedKeys = Object.keys(pressedKeys);
+
+const setLevel = (level: LevelPoint[]) => {
+  levelLayout = [];
+
+  level.forEach((point) => {
+    levelLayout.push(new Platform({
+      canvas,
+      ctx,
+      y: point.y === 'max' ? canvas.height - point.height : point.y,
+      x: point.x === 'max' ? canvas.width - point.width : point.x,
+      width: point.width === 'max' ? canvas.width : point.width,
+      height: point.height === 'max' ? canvas.height : point.height,
+    }));
+  })
+}
 
 const drawLevel = () => {
   levelLayout.forEach((object) => {
@@ -86,17 +102,21 @@ export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanv
   ctx = gameCtx;
   ctx.imageSmoothingEnabled = false;
 
-  level1.forEach((point) => {
-    levelLayout.push(new Platform({
-      canvas,
-      ctx,
-      y: point.y === 'max' ? canvas.height - point.height : point.y,
-      x: point.x === 'max' ? canvas.width - point.width : point.x,
-      width: point.width === 'max' ? canvas.width : point.width,
-      height: point.height === 'max' ? canvas.height : point.height,
-    }));
-  })
+  setLevel(level1);
 
   renderFrame();
   initEventListeners();
+};
+
+
+export const useControls = () => {
+  const setGameLevel = useCallback((level: LevelPoint[]) => {
+    setLevel(level);
+    player.setPosition({ x: 50, y: 100 });
+    (document.activeElement as HTMLElement)?.blur();
+  }, []);
+
+  return {
+    setGameLevel,
+  }
 };
