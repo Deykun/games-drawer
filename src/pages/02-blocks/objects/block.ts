@@ -129,7 +129,6 @@ export class Block extends IsometricObject {
       } else {
         for (let i = 0; i < Math.abs(modifyByNumber); i++) {
           newType = newType.replace('1', '0');
-          console.log('Replaced', newType);
         }
       }
     }
