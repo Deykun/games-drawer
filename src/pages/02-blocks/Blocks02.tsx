@@ -18,7 +18,6 @@ const Blocks02 = () => {
           <button onClick={() => setActionMode('build')} className={clsx({ 'font-bold': activeAction === 'build' })}>Build</button>
           <button onClick={() => setGameMap(defaultMap)} className="ml-auto">Default map</button>
           <button onClick={() => setGameMap(flatMap)}>Flat map</button>
-          
         </div>
         <details className="mt-10">
           <summary>What works?</summary>

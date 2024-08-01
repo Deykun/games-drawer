@@ -57,6 +57,16 @@ export class Player {
     this.state = state;
   }
 
+  setPosition({ x, y }: { x?: number, y?: number } = {}) {
+    if (typeof x === 'number') {
+      this.x = x;
+    }
+
+    if (typeof y === 'number') {
+      this.y = y;
+    }
+  }
+
   drawFrame({ image, frame = 0, x, y }: { image: HTMLImageElement, frame: number, x: number, y: number}) {
     const frameWidth = 10;
     const frameHeight = 12;

@@ -1,4 +1,8 @@
-import { gravity } from '../constants';
+import { gravity, scaleFactor } from '../constants';
+
+const fallThreshold = gravity + 1;
+const hoveringThreshold = 4 * scaleFactor;
+
 export class Platform {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -53,13 +57,12 @@ export class Platform {
     this.color = '#23291d';
 
     const isInRangeOfX = object.x + object.width >= this.x && object.x <= this.x + this.width;
+    const isInRangeOfXWithThreshold = object.x + object.width - hoveringThreshold >= this.x && object.x <= this.x + this.width - hoveringThreshold;
     const wasInRangeOfX = object.prevX >= this.x && object.prevX <= this.x + this.width;
 
     const didHitFromBelow = isInRangeOfX && wasInRangeOfX && object.y <= this.y + this.height && object.prevY > this.y + this.height;
+    const didFall = isInRangeOfXWithThreshold && !didHitFromBelow && object.y < this.y && object.y + (object.height - fallThreshold) < this.y;
 
-    const fallThreshold = gravity + 1;
-    const didFall = !didHitFromBelow && object.y < this.y && object.y + (object.height - fallThreshold) < this.y;
-    
     const isWallOnLeft = !didFall && object.x > this.x;
     const isWallOnRight = !didFall && object.x < this.x;
 
@@ -80,7 +83,7 @@ export class Platform {
     }
     
     if (didHitFromBelow) {
-      y = object.y - object.dy;
+      y = object.y - object.dy - gravity;
       x = object.x - object.dx;
     }
 
