@@ -2,8 +2,21 @@ import clsx from 'clsx';
 
 import Canvas from '../../app/Canvas'
 
-import { exampleMap, flatMap } from './constants';
+import { exampleMap, flatMap, ActionModes } from './constants';
 import { runGame, useControls } from './game';
+
+const actions: {
+  action: ActionModes,
+  label: string,
+  className?: string,
+}[] = [
+  { action: 'rotate', label: 'Rotate' },
+  { action: 'random', label: 'random' },
+  { action: 'remove', label: 'remove' },
+  { action: 'increase', label: '+', className: 'ml-auto' },
+  { action: 'build', label: 'build' },
+  { action: 'decrease', label: '-' },
+]
 
 const Blocks02 = () => {
   const { activeAction, setActionMode, setGameMap } = useControls();
@@ -12,10 +25,15 @@ const Blocks02 = () => {
       <>
         <Canvas runGame={runGame} height={400} width={600} className="bg-[#5eb22d] mx-auto" />
         <div className="max-w-[600px] mx-auto mt-5 flex gap-5">
-          <button onClick={() => setActionMode('rotate')} className={clsx({ 'font-bold': activeAction === 'rotate' })}>Rotate</button>
-          <button onClick={() => setActionMode('random')} className={clsx({ 'font-bold': activeAction === 'random' })}>Random</button>
-          <button onClick={() => setActionMode('remove')} className={clsx({ 'font-bold': activeAction === 'remove' })}>Remove</button>
-          <button onClick={() => setActionMode('build')} className={clsx({ 'font-bold': activeAction === 'build' })}>Build</button>
+          {actions.map(({ action, label, className }) => 
+            <button
+              key={action}
+              onClick={() => setActionMode(action)}
+              className={clsx({ 'font-bold': activeAction === action, [className || '']: className })}
+            >
+              {label}
+            </button>
+          )}
           <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Example map</button>
           <button onClick={() => setGameMap(flatMap)}>Flat map</button>
         </div>

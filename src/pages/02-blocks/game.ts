@@ -121,6 +121,14 @@ const initEventListeners = () => {
         clickedObject.changeType(getRandomItem(BlockTypes) ?? '1111')
       }
 
+      if (activeMode === 'decrease') {
+        clickedObject.changeCornersNumber(-1);
+      }
+
+      if (activeMode === 'increase') {
+        clickedObject.changeCornersNumber(1);
+      }
+
       if (activeMode === 'build') {
         const position = clickedObject.position;
         const newPosition = {

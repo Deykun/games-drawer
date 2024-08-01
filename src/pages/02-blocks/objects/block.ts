@@ -103,6 +103,40 @@ export class Block extends IsometricObject {
     this.type = type;
   }
 
+  changeCornersNumber(modifyByNumber: -4 | -3 | -2 | -1 | 0 | 1 | 2 | 3 | 4) {
+    const currentCornerCount = (this.type.match(new RegExp("1", "g")) || []).length;
+
+    const newCornerCount = currentCornerCount + modifyByNumber;
+
+    const isValidChange = newCornerCount >= 0 && newCornerCount <= 4;
+    if (!isValidChange) {
+      return;
+    }
+
+    let newType = this.type;
+    if (modifyByNumber > 0) {
+      for (let i = 0; i < modifyByNumber; i++) {
+        newType = newType.replace('0', '1');
+      }
+    } else {
+      // Not all two corner types are supported
+      if (currentCornerCount === 3) {
+        if (this.type.startsWith('11')) {
+          newType = '1100';
+        } else {
+          newType = '0011';
+        }
+      } else {
+        for (let i = 0; i < Math.abs(modifyByNumber); i++) {
+          newType = newType.replace('1', '0');
+          console.log('Replaced', newType);
+        }
+      }
+    }
+
+    this.type = newType;
+  }
+
   rotate() {
     const rotationArray = [
       ['1000', '0100', '0010', '0001'],
