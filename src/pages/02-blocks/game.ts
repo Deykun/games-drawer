@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
-import { defaultMap, ActionModes, savedPoint } from './constants'
+import { defaultMap, ActionModes, SavedPoint } from './constants'
 import { IsometricObject } from './objects/meta';
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
@@ -36,7 +36,7 @@ const rotateMap = () => {
   refreshObjectsForRender();
 };
 
-const setMap = (points: savedPoint[]) => {
+const setMap = (points: SavedPoint[]) => {
   objectsByPosition = {};
 
   points.forEach((point) => {
@@ -188,7 +188,7 @@ export const useControls = () => {
     activeMode = activeAction;
   }, [activeAction]);
 
-  const setGameMap = useCallback((map: string[][][]) => {
+  const setGameMap = useCallback((map: SavedPoint[]) => {
     setMap(map);
   }, []);
 

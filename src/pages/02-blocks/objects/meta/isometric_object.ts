@@ -16,7 +16,7 @@ export class IsometricObject {
 
   setCanvasDrawData({ x, y, z }: { x: number, y: number, z: number }) {
     const paddingTop = 50 + Math.floor(this.canvas.height/ 2);
-    const paddingLeft = Math.floor(this.canvas.width / 2);
+    const paddingLeft = -25 + Math.floor(this.canvas.width / 2);
     const isoX = x * this.width / 2;
     const isoY = y * this.width / 2;
     const isoZ = z * this.width / 2;
