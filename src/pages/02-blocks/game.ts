@@ -142,7 +142,6 @@ const initEventListeners = () => {
   });
 
   canvas.addEventListener('wheel', (event) => {
-    console.log(event);
     if (event.deltaY < 0) {
       zoomLevel = Math.round(zoomLevel + 1);
     } else {
