@@ -1,13 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
 import { defaultMap, ActionModes } from './constants'
+import { IsometricObject } from './objects/meta'
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
 let objectsByPosition: {
   [location: string]: Block,
 } = {};
-let objectsSortedForRender: Block[] = [];
+let objectsSortedForRender: IsometricObject[] = [];
+let mapOrientation: 0 | 1 | 2 | 3 = 0;
 let pointer: Pointer | undefined = undefined;
 
 let activeMode: ActionModes = 'random';
@@ -122,7 +124,13 @@ const initEventListeners = () => {
       }
 
       if (activeMode === 'decrease') {
-        clickedObject.changeCornersNumber(-1);
+        const { isEmpty } = clickedObject.changeCornersNumber(-1);
+
+        if (isEmpty) {
+          delete objectsByPosition[objectLocation];
+
+          refreshObjectsForRender();
+        }
       }
 
       if (activeMode === 'increase') {

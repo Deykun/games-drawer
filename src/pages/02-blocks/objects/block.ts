@@ -134,6 +134,8 @@ export class Block extends IsometricObject {
     }
 
     this.type = newType;
+
+    return { isEmpty: newType === '0000' };
   }
 
   rotate() {

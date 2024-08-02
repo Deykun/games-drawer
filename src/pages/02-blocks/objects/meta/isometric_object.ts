@@ -15,6 +15,7 @@ export class IsometricObject {
     y: number
     z: number
   };
+  renderIndex: number;
   height: number;
   width: number;
 
@@ -25,6 +26,7 @@ export class IsometricObject {
       y,
       z,
     };
+    this.renderIndex = (1000 * z) + (10 * y) + x;
     this.x = tileWidth * x * scaleFactor + leftPadding;
     if (y % 2 === 1) {
       this.x = this.x + ((tileWidth * scaleFactor) / 2)
