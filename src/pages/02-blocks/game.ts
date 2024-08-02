@@ -217,19 +217,3 @@ window.savePoints = () => {
 
   return JSON.stringify(compressedObjects);
 }
-
-// const setMap = (map: string[][][]) => {
-//   objectsByPosition = {};
-
-//   map.forEach((z, zIndex) => {
-//     z.forEach((y, yIndex) => {
-//       y.forEach((type, xIndex) => {
-//         const object = new Block({ canvas, ctx, type, x: xIndex - offsetMap, y: yIndex - offsetMap, z: zIndex });
-
-//         objectsByPosition[object.location] = object;
-//       });
-//     });
-//   });
-
-//   refreshObjectsForRender();
-// }

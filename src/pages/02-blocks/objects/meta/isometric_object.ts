@@ -39,7 +39,7 @@ export class IsometricObject {
     this.height = 17 * scaleFactor;
     this.width = 16 * scaleFactor;
 
-    /* Temporary is set by metod below */
+    /* Temporary to satisfy TS is set by the method below */
     this.x = 0;
     this.y = 0;
     this.location = `0x0x0`;

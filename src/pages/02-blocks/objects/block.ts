@@ -148,8 +148,6 @@ export class Block extends IsometricObject {
       ['1110', '0111', '1011', '1101'],
       ['1111'],
     ].find((arr) => arr.includes(this.type));
-        // this.type = [this.type.at(-1), this.type.substring(0,3)].join('');
-
     if (Array.isArray(rotationArray)) {
       const currentIndex = rotationArray.findIndex((type) => this.type === type);
 
