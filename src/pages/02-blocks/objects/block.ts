@@ -1,4 +1,4 @@
-import { IsometricObject, scaleFactor } from './meta/isometric_object';
+import { IsometricObject } from './meta/isometric_object';
 
 import Image0001 from '../assets/0001.png';
 import Image0010 from '../assets/0010.png';
@@ -39,21 +39,22 @@ export class Block extends IsometricObject {
   type: string;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, type, z, x, y }: {
+  constructor ({ canvas, ctx, type, z, x, y, zoomLevel }: {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     type: string,
     z: number,
     x: number,
     y: number,
+    zoomLevel: number,
   }) {
-    super({ canvas, z, x, y });
+    super({ canvas, z, x, y, zoomLevel });
 
     this.ctx = ctx;
     this.type = type;
   }
 
-  draw() {
+  draw({ screenOffsetX = 0, screenOffsetY = 0 }: { screenOffsetX?: number, screenOffsetY?: number } = {}) {
     if (this.type === '0000') {
       return;
     }
@@ -61,7 +62,7 @@ export class Block extends IsometricObject {
     this.image = new Image();
     this.image.src = BlockByType[this.type];
 
-    this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    this.ctx.drawImage(this.image, this.x + screenOffsetX, this.y + screenOffsetY, this.width, this.height);
 
     // this.ctx.textBaseline = "top";
     // this.ctx.fillStyle = 'white';
@@ -84,9 +85,9 @@ export class Block extends IsometricObject {
 
     try {
       document.body.appendChild(canvas);
-      canvas.width = this.width * scaleFactor;
-      canvas.height = this.height * scaleFactor;
-      var context = canvas.getContext("2d");
+      canvas.width = this.width * this.zoomLevel;
+      canvas.height = this.height * this.zoomLevel;
+      const context = canvas.getContext("2d");
 
       if (context) {
         context.drawImage(this.image, 0, 0, this.width, this.height);
@@ -113,7 +114,7 @@ export class Block extends IsometricObject {
 
     const isValidChange = newCornerCount >= 0 && newCornerCount <= 4;
     if (!isValidChange) {
-      return;
+      return { isEmpty: false };
     }
 
     let newType = this.type;

@@ -23,17 +23,17 @@ export class Pointer extends IsometricObject {
   ctx: CanvasRenderingContext2D;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, z, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, z: number, x: number, y: number}) {
-    super({ canvas, z, x, y });
+  constructor ({ canvas, ctx, z, x, y, zoomLevel }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, z: number, x: number, y: number, zoomLevel: number }) {
+    super({ canvas, z, x, y, zoomLevel });
 
     this.canvas = canvas;
     this.ctx = ctx;
   }
 
-  draw({ activeMode }: { activeMode?: ActionModes } = {}) {  
+  draw({ activeMode, screenOffsetX = 0, screenOffsetY = 0 }: { activeMode?: ActionModes, screenOffsetX?: number, screenOffsetY?: number } = {}) {  
     this.image = new Image();
     this.image.src = PointerByActiveMode[activeMode || ''] || ImagePointer;
 
-    this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    this.ctx.drawImage(this.image, this.x + screenOffsetX, this.y + screenOffsetY, this.width, this.height);
   }
 }

@@ -1,4 +1,5 @@
-export const scaleFactor = 2;
+const tileHeight = 17;
+const tileWidth = 16
 
 export class IsometricObject {
   canvas: HTMLCanvasElement;
@@ -11,12 +12,13 @@ export class IsometricObject {
   };
   location: string;
   renderIndex: number;
+  zoomLevel: number;
   height: number;
   width: number;
 
   setCanvasDrawData({ x, y, z }: { x: number, y: number, z: number }) {
-    const paddingTop = 50 + Math.floor(this.canvas.height/ 2);
-    const paddingLeft = -25 + Math.floor(this.canvas.width / 2);
+    const paddingTop = Math.floor(this.canvas.height/ 2);
+    const paddingLeft = Math.floor(this.canvas.width / 2);
     const isoX = x * this.width / 2;
     const isoY = y * this.width / 2;
     const isoZ = z * this.width / 2;
@@ -28,7 +30,7 @@ export class IsometricObject {
     this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
-  constructor ({ canvas, z, x, y }: {     canvas: HTMLCanvasElement, z: number, x: number, y: number }) {
+  constructor ({ canvas, z, x, y, zoomLevel }: {     canvas: HTMLCanvasElement, z: number, x: number, y: number, zoomLevel: number }) {
     this.canvas = canvas;
     this.position = {
       x,
@@ -36,8 +38,9 @@ export class IsometricObject {
       z,
     };
 
-    this.height = 17 * scaleFactor;
-    this.width = 16 * scaleFactor;
+    this.zoomLevel = zoomLevel;
+    this.height = tileHeight * zoomLevel;
+    this.width = tileWidth * zoomLevel;
 
     /* Temporary to satisfy TS is set by the method below */
     this.x = 0;
@@ -60,8 +63,16 @@ export class IsometricObject {
     this.position.x = oldY;
     this.position.y = -oldX;
 
-    this.setCanvasDrawData(this.position)
+    this.setCanvasDrawData(this.position);
 
     return this.location;
+  }
+
+  setZoom(zoomLevel: number) {
+    this.zoomLevel = zoomLevel;
+    this.height = tileHeight * zoomLevel;
+    this.width = tileWidth * zoomLevel;
+
+    this.setCanvasDrawData(this.position);
   }
 }
