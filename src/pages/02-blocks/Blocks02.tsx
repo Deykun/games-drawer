@@ -11,7 +11,6 @@ const actions: {
   className?: string,
 }[] = [
   { action: 'rotate', label: 'Rotate' },
-  { action: 'random', label: 'Random' },
   { action: 'remove', label: 'Remove' },
   { action: 'increase', label: '+', className: 'ml-auto' },
   { action: 'build', label: 'Build' },
@@ -19,7 +18,7 @@ const actions: {
 ]
 
 const Blocks02 = () => {
-  const { activeAction, setActionMode, setGameMap } = useControls();
+  const { activeAction, setActionMode, setGameMap, rotateGameMap } = useControls();
 
   return (
       <>
@@ -34,8 +33,9 @@ const Blocks02 = () => {
               {label}
             </button>
           )}
-          <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Example map</button>
-          <button onClick={() => setGameMap(flatMap)}>Flat map</button>
+          <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Default</button>
+          <button onClick={() => setGameMap(flatMap)}>Flat</button>
+          <button onClick={() => rotateGameMap()}>Rotate</button>
         </div>
         <details className="mt-10">
           <summary>What works?</summary>

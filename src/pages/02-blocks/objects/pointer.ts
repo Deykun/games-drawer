@@ -24,7 +24,7 @@ export class Pointer extends IsometricObject {
   image?: HTMLImageElement;
 
   constructor ({ canvas, ctx, z, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, z: number, x: number, y: number}) {
-    super({ z, x, y });
+    super({ canvas, z, x, y });
 
     this.canvas = canvas;
     this.ctx = ctx;

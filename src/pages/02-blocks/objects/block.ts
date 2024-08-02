@@ -35,19 +35,22 @@ const BlockByType: {
 export const BlockTypes = Object.keys(BlockByType) as string[];
 
 export class Block extends IsometricObject {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   type: string;
-  renderIndex: number;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, type, z, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: string, z: number, x: number, y: number}) {
-    super({ z, x, y });
+  constructor ({ canvas, ctx, type, z, x, y }: {
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    type: string,
+    z: number,
+    x: number,
+    y: number,
+  }) {
+    super({ canvas, z, x, y });
 
-    this.canvas = canvas;
     this.ctx = ctx;
     this.type = type;
-    this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
   draw() {
@@ -62,7 +65,7 @@ export class Block extends IsometricObject {
 
     // this.ctx.textBaseline = "top";
     // this.ctx.fillStyle = 'white';
-    // this.ctx.fillText(`${this.position.x},${this.position.y},${this.position.z}`, this.x, this.y);
+    // this.ctx.fillText(this.location, this.x, this.y);
   }
 
   wasClicked(object?: { x: number, y: number }) {
@@ -134,16 +137,17 @@ export class Block extends IsometricObject {
     }
 
     this.type = newType;
+
+    return { isEmpty: newType === '0000' };
   }
 
   rotate() {
     const rotationArray = [
       ['1000', '0100', '0010', '0001'],
       ['1100', '0110', '0011', '1001'],
-      ['1110', '1011', '1101', '0111'],
+      ['1110', '0111', '1011', '1101'],
       ['1111'],
     ].find((arr) => arr.includes(this.type));
-
     if (Array.isArray(rotationArray)) {
       const currentIndex = rotationArray.findIndex((type) => this.type === type);
 
@@ -155,5 +159,13 @@ export class Block extends IsometricObject {
     }
 
     return false;
+  }
+
+  transpose() {
+    const newLocation = super.transpose();
+
+    this.rotate();
+    
+    return newLocation;
   }
 }

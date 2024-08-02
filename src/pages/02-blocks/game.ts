@@ -1,16 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
-import { defaultMap, ActionModes } from './constants'
+import { defaultMap, ActionModes, SavedPoint } from './constants'
+import { IsometricObject } from './objects/meta';
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
 let objectsByPosition: {
   [location: string]: Block,
 } = {};
-let objectsSortedForRender: Block[] = [];
+let objectsSortedForRender: IsometricObject[] = [];
 let pointer: Pointer | undefined = undefined;
 
-let activeMode: ActionModes = 'random';
+let activeMode: ActionModes = 'build';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
@@ -19,17 +20,29 @@ const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
 }
 
-const setMap = (map: string[][][]) => {
+const rotateMap = () => {
+  const newObjectsByPostion: {
+    [location: string]: Block,
+  } = {};
+
+  Object.values(objectsByPosition).forEach((object) => {
+    const newLocation = object.transpose();
+
+    newObjectsByPostion[newLocation] = object;
+  })
+
+  objectsByPosition = newObjectsByPostion;
+
+  refreshObjectsForRender();
+};
+
+const setMap = (points: SavedPoint[]) => {
   objectsByPosition = {};
 
-  map.forEach((z, zIndex) => {
-    z.forEach((y, yIndex) => {
-      y.forEach((type, xIndex) => {
-        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
+  points.forEach((point) => {
+      const object = new Block({ canvas, ctx, ...point });
 
-        objectsByPosition[`${xIndex}x${yIndex}x${zIndex}`] = object;
-      });
-    });
+      objectsByPosition[object.location] = object;
   });
 
   refreshObjectsForRender();
@@ -109,10 +122,8 @@ const initEventListeners = () => {
         clickedObject?.rotate();
       }
 
-      const objectLocation = `${clickedObject.position.x}x${clickedObject.position.y}x${clickedObject.position.z}`;
-
       if (activeMode === 'remove') {
-        delete objectsByPosition[objectLocation];
+        delete objectsByPosition[clickedObject.location];
 
         refreshObjectsForRender();
       }
@@ -122,7 +133,13 @@ const initEventListeners = () => {
       }
 
       if (activeMode === 'decrease') {
-        clickedObject.changeCornersNumber(-1);
+        const { isEmpty } = clickedObject.changeCornersNumber(-1);
+
+        if (isEmpty) {
+          delete objectsByPosition[clickedObject.location];
+
+          refreshObjectsForRender();
+        }
       }
 
       if (activeMode === 'increase') {
@@ -171,13 +188,32 @@ export const useControls = () => {
     activeMode = activeAction;
   }, [activeAction]);
 
-  const setGameMap = useCallback((map: string[][][]) => {
+  const setGameMap = useCallback((map: SavedPoint[]) => {
     setMap(map);
+  }, []);
+
+  const rotateGameMap = useCallback(() => {
+    rotateMap();
   }, []);
 
   return {
     activeAction,
     setActionMode,
     setGameMap,
+    rotateGameMap,
   }
 };
+
+
+declare global {
+  interface Window { savePoints: () => string; }
+}
+
+window.savePoints = () => {
+  const compressedObjects = Object.values(objectsByPosition).map((object) => ({
+    ...object.position,
+    type: object.type,
+  }));
+
+  return JSON.stringify(compressedObjects);
+}
