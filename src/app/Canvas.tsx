@@ -15,7 +15,7 @@ const Canvas = ({ id = 'canvas', className, height = 400, width = 700, runGame }
   useEffect(() => {
     if (canvasRef.current) {
       canvasCtxRef.current = canvasRef.current.getContext('2d');
-      let ctx = canvasCtxRef.current;
+      const ctx = canvasCtxRef.current;
 
       if (ctx) {
         runGame({ canvas: canvasRef.current, ctx })

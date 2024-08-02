@@ -87,7 +87,7 @@ export class Block extends IsometricObject {
       document.body.appendChild(canvas);
       canvas.width = this.width * this.zoomLevel;
       canvas.height = this.height * this.zoomLevel;
-      var context = canvas.getContext("2d");
+      const context = canvas.getContext("2d");
 
       if (context) {
         context.drawImage(this.image, 0, 0, this.width, this.height);

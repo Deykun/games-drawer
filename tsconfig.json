@@ -4,13 +4,11 @@
     {
       "path": "./tsconfig.app.json"
     },
-    {
-      "path": "./tsconfig.node.json"
-    }
   ],
   "compilerOptions": {
     "paths": {
-      "@*": ["./script/*", "./src/*", "./src/*/index"],
+      "@*": ["./src/*", "./src/*/index"],
     }
   },
+  "include": ["src"]
 }

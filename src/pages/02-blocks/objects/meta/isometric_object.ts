@@ -63,7 +63,7 @@ export class IsometricObject {
     this.position.x = oldY;
     this.position.y = -oldX;
 
-    this.setCanvasDrawData(this.position)
+    this.setCanvasDrawData(this.position);
 
     return this.location;
   }
