@@ -1,5 +1,3 @@
-import { Orientation } from '../../constants'
-
 export const scaleFactor = 2;
 
 export class IsometricObject {
@@ -12,13 +10,12 @@ export class IsometricObject {
     z: number
   };
   location: string;
-  orientation?: Orientation;
   renderIndex: number;
   height: number;
   width: number;
 
   setCanvasDrawData({ x, y, z }: { x: number, y: number, z: number }) {
-    const paddingTop = Math.floor(this.canvas.height/ 2);
+    const paddingTop = 50 + Math.floor(this.canvas.height/ 2);
     const paddingLeft = Math.floor(this.canvas.width / 2);
     const isoX = x * this.width / 2;
     const isoY = y * this.width / 2;
@@ -31,14 +28,13 @@ export class IsometricObject {
     this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
-  constructor ({ canvas, z, x, y, orientation }: {     canvas: HTMLCanvasElement, z: number, x: number, y: number, orientation?: Orientation }) {
+  constructor ({ canvas, z, x, y }: {     canvas: HTMLCanvasElement, z: number, x: number, y: number }) {
     this.canvas = canvas;
     this.position = {
       x,
       y,
       z,
     };
-    this.orientation = orientation;
 
     this.height = 17 * scaleFactor;
     this.width = 16 * scaleFactor;

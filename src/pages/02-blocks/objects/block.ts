@@ -1,5 +1,3 @@
-import { Orientation } from '../constants';
-
 import { IsometricObject, scaleFactor } from './meta/isometric_object';
 
 import Image0001 from '../assets/0001.png';
@@ -147,7 +145,7 @@ export class Block extends IsometricObject {
     const rotationArray = [
       ['1000', '0100', '0010', '0001'],
       ['1100', '0110', '0011', '1001'],
-      ['1110', '1011', '1101', '0111'],
+      ['1110', '0111', '1011', '1101'],
       ['1111'],
     ].find((arr) => arr.includes(this.type));
         // this.type = [this.type.at(-1), this.type.substring(0,3)].join('');

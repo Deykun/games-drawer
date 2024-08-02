@@ -19,7 +19,7 @@ const actions: {
 ]
 
 const Blocks02 = () => {
-  const { activeAction, setActionMode, setGameMap, setGameMapOrientation } = useControls();
+  const { activeAction, setActionMode, setGameMap, rotateGameMap } = useControls();
 
   return (
       <>
@@ -36,7 +36,7 @@ const Blocks02 = () => {
           )}
           <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Default</button>
           <button onClick={() => setGameMap(flatMap)}>Flat</button>
-          <button onClick={() => setGameMapOrientation()}>Rotate</button>
+          <button onClick={() => rotateGameMap()}>Rotate</button>
         </div>
         <details className="mt-10">
           <summary>What works?</summary>

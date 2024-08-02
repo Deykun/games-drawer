@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
-import { defaultMap, ActionModes, Orientation } from './constants'
-import { IsometricObject } from './objects/meta'
+import { defaultMap, ActionModes, savedPoint } from './constants'
+import { IsometricObject } from './objects/meta';
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
@@ -20,7 +20,7 @@ const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
 }
 
-const setMapOrientation = () => {
+const rotateMap = () => {
   const newObjectsByPostion: {
     [location: string]: Block,
   } = {};
@@ -36,20 +36,13 @@ const setMapOrientation = () => {
   refreshObjectsForRender();
 };
 
-// To put 0,0,0 near the center
-const offsetMap = 4;
-
-const setMap = (map: string[][][]) => {
+const setMap = (points: savedPoint[]) => {
   objectsByPosition = {};
 
-  map.forEach((z, zIndex) => {
-    z.forEach((y, yIndex) => {
-      y.forEach((type, xIndex) => {
-        const object = new Block({ canvas, ctx, type, x: xIndex - offsetMap, y: yIndex - offsetMap, z: zIndex });
+  points.forEach((point) => {
+      const object = new Block({ canvas, ctx, ...point });
 
-        objectsByPosition[object.location] = object;
-      });
-    });
+      objectsByPosition[object.location] = object;
   });
 
   refreshObjectsForRender();
@@ -199,14 +192,44 @@ export const useControls = () => {
     setMap(map);
   }, []);
 
-  const setGameMapOrientation = useCallback(() => {
-    setMapOrientation();
+  const rotateGameMap = useCallback(() => {
+    rotateMap();
   }, []);
 
   return {
     activeAction,
     setActionMode,
     setGameMap,
-    setGameMapOrientation,
+    rotateGameMap,
   }
 };
+
+
+declare global {
+  interface Window { savePoints: () => string; }
+}
+
+window.savePoints = () => {
+  const compressedObjects = Object.values(objectsByPosition).map((object) => ({
+    ...object.position,
+    type: object.type,
+  }));
+
+  return JSON.stringify(compressedObjects);
+}
+
+// const setMap = (map: string[][][]) => {
+//   objectsByPosition = {};
+
+//   map.forEach((z, zIndex) => {
+//     z.forEach((y, yIndex) => {
+//       y.forEach((type, xIndex) => {
+//         const object = new Block({ canvas, ctx, type, x: xIndex - offsetMap, y: yIndex - offsetMap, z: zIndex });
+
+//         objectsByPosition[object.location] = object;
+//       });
+//     });
+//   });
+
+//   refreshObjectsForRender();
+// }
