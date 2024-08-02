@@ -1,20 +1,22 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getRandomItem } from '../../utils/math'
-import { defaultMap, ActionModes, SavedPoint } from './constants'
-import { IsometricObject } from './objects/meta';
+import { getRandomItem, clamp } from '../../utils/math'
+import { defaultMap, ActionModes, SavedPoint, SupportedKeys } from './constants'
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
 let objectsByPosition: {
   [location: string]: Block,
 } = {};
-let objectsSortedForRender: IsometricObject[] = [];
+let objectsSortedForRender: Block[] = [];
 let pointer: Pointer | undefined = undefined;
 
 let activeMode: ActionModes = 'build';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
+let screenOffsetX = -25;
+let screenOffsetY = 50;
+let zoomLevel = 2;
 
 const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
@@ -36,11 +38,19 @@ const rotateMap = () => {
   refreshObjectsForRender();
 };
 
+const setNewZoomLevel = () => {
+  Object.values(objectsByPosition).forEach((object) => {
+    object.setZoom(zoomLevel);
+  })
+
+  refreshObjectsForRender();
+};
+
 const setMap = (points: SavedPoint[]) => {
   objectsByPosition = {};
 
   points.forEach((point) => {
-      const object = new Block({ canvas, ctx, ...point });
+      const object = new Block({ canvas, ctx, ...point, zoomLevel });
 
       objectsByPosition[object.location] = object;
   });
@@ -50,30 +60,58 @@ const setMap = (points: SavedPoint[]) => {
 
 const drawMap = () => {
   objectsSortedForRender.forEach((object) => {
-    object.draw();
+    object.draw({ screenOffsetX, screenOffsetY });
   })
 
   if (pointer) {
-    pointer.draw({ activeMode })
+    pointer.draw({ activeMode, screenOffsetX, screenOffsetY });
   }
 }
 
 const fps = 25;
 const renderFrame = () => {
   setTimeout(() => {
+    if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight) {
+      screenOffsetX = pressedKeys.ArrowLeft ? screenOffsetX - 5 : screenOffsetX + 5;
+    }
+
+    if (pressedKeys.ArrowUp || pressedKeys.ArrowDown) {
+      screenOffsetY = pressedKeys.ArrowDown ? screenOffsetY - 5 : screenOffsetY + 5;
+    }
+
     window.requestAnimationFrame(renderFrame);
   }, 1000 / fps);
-
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawMap();
 }
 
+const pressedKeys: SupportedKeys = {
+  ArrowUp: false,
+  ArrowDown: false,
+  ArrowLeft: false,
+  ArrowRight: false,
+};
+
+const allowedKeys = Object.keys(pressedKeys);
+
 const initEventListeners = () => {
+  window.addEventListener('keydown', (e) => {
+    if (allowedKeys.includes(e.key)) {
+      pressedKeys[e.key as keyof SupportedKeys] = true;
+    }
+  })
+
+  window.addEventListener('keyup', (e) => {
+    if (allowedKeys.includes(e.key)) {
+      pressedKeys[e.key as keyof SupportedKeys] = false;
+    }
+  })
+
   canvas.addEventListener('mousemove', (event) => {
     const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = event.clientX - rect.left - screenOffsetX;
+    const y = event.clientY - rect.top - screenOffsetY;
 
     const hoveredObjectIndex = objectsSortedForRender.findLastIndex((object) => object.wasClicked({ x, y }));
     const hoveredObject = objectsSortedForRender[hoveredObjectIndex];
@@ -94,13 +132,28 @@ const initEventListeners = () => {
       }
 
       if (!pointer) {
-        pointer = new Pointer({ canvas, ctx, ...newPosition });
+        pointer = new Pointer({ canvas, ctx, zoomLevel, ...newPosition });
 
         return;
       }
 
       pointer.move(newPosition);
     }
+  });
+
+  canvas.addEventListener('wheel', (event) => {
+    console.log(event);
+    if (event.deltaY < 0) {
+      zoomLevel = Math.round(zoomLevel + 1);
+    } else {
+      zoomLevel = Math.round(zoomLevel - 1);
+    }
+
+    zoomLevel = clamp(0.5, zoomLevel, 8);
+
+    pointer = undefined;
+
+    setNewZoomLevel();
   });
 
   canvas.addEventListener('mouseleave', () => {
@@ -111,8 +164,8 @@ const initEventListeners = () => {
 
   canvas.addEventListener('click', (event) => {
     const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = event.clientX - rect.left - screenOffsetX;
+    const y = event.clientY - rect.top - screenOffsetY;
 
     const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => object.wasClicked({ x, y }));
     const clickedObject = objectsSortedForRender[clickedObjectIndex];
@@ -156,7 +209,7 @@ const initEventListeners = () => {
         const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
         const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
         if (!isBlocked) {
-          const object = new Block({ canvas, ctx, type: '1111', ...newPosition });
+          const object = new Block({ canvas, ctx, type: '1111', zoomLevel, ...newPosition });
 
           objectsByPosition[objectAboveLocation] = object;
 
