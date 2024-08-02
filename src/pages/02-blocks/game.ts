@@ -11,7 +11,7 @@ let objectsByPosition: {
 let objectsSortedForRender: IsometricObject[] = [];
 let pointer: Pointer | undefined = undefined;
 
-let activeMode: ActionModes = 'random';
+let activeMode: ActionModes = 'build';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;

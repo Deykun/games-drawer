@@ -11,7 +11,6 @@ const actions: {
   className?: string,
 }[] = [
   { action: 'rotate', label: 'Rotate' },
-  { action: 'random', label: 'Random' },
   { action: 'remove', label: 'Remove' },
   { action: 'increase', label: '+', className: 'ml-auto' },
   { action: 'build', label: 'Build' },
