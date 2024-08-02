@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem } from '../../utils/math'
-import { defaultMap, ActionModes } from './constants'
+import { defaultMap, ActionModes, Orientation } from './constants'
 import { IsometricObject } from './objects/meta'
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
@@ -21,13 +21,28 @@ const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
 }
 
+const setMapOrientation = (orientation: Orientation) => {
+  const newObjectsByPostion: {
+    [location: string]: Block,
+  } = {}
+  Object.values(objectsByPosition).forEach((object) => {
+    const newLocation = object.transpose(orientation);
+
+    newObjectsByPostion[newLocation] = object;
+  })
+
+  objectsByPosition = newObjectsByPostion;
+
+  refreshObjectsForRender();
+};
+
 const setMap = (map: string[][][]) => {
   objectsByPosition = {};
 
   map.forEach((z, zIndex) => {
     z.forEach((y, yIndex) => {
       y.forEach((type, xIndex) => {
-        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex });
+        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex, orientation: mapOrientation });
 
         objectsByPosition[`${xIndex}x${yIndex}x${zIndex}`] = object;
       });
@@ -111,10 +126,8 @@ const initEventListeners = () => {
         clickedObject?.rotate();
       }
 
-      const objectLocation = `${clickedObject.position.x}x${clickedObject.position.y}x${clickedObject.position.z}`;
-
       if (activeMode === 'remove') {
-        delete objectsByPosition[objectLocation];
+        delete objectsByPosition[clickedObject.location];
 
         refreshObjectsForRender();
       }
@@ -127,7 +140,7 @@ const initEventListeners = () => {
         const { isEmpty } = clickedObject.changeCornersNumber(-1);
 
         if (isEmpty) {
-          delete objectsByPosition[objectLocation];
+          delete objectsByPosition[clickedObject.location];
 
           refreshObjectsForRender();
         }
@@ -183,9 +196,14 @@ export const useControls = () => {
     setMap(map);
   }, []);
 
+  const setGameMapOrientation = useCallback((newOrientation: 0 | 1 | 2 | 3) => {
+    setMapOrientation(newOrientation);
+  }, []);
+
   return {
     activeAction,
     setActionMode,
     setGameMap,
+    setGameMapOrientation,
   }
 };

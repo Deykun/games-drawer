@@ -1,5 +1,7 @@
 export type ActionModes = 'random' | 'rotate' | 'remove' | 'build' | 'increase' | 'decrease';
 
+export type Orientation = 0 | 1 | 2 | 3;
+
 export const exampleMap: string[][][] = [
   [
     ['0000', '0000', '1001'],
@@ -98,4 +100,22 @@ export const flatMap: string[][][] = [
   ],
 ].reverse();
 
-export const defaultMap = exampleMap;
+export const microMap: string[][][] = [
+  [
+    ['1001'],
+    [],
+    [],
+    [],
+    ['0000', '0000', '0100'],
+  ],
+  [
+    ['1111', '1111', '1111'],
+    ['1111', '0000'],
+    ['1111', '1111', '1111'],
+    ['1111', '1111'],
+    ['1111', '1111', '1111'],
+  ]
+].reverse();
+
+// export const defaultMap = exampleMap;
+export const defaultMap = microMap;

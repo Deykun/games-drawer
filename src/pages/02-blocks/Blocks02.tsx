@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import Canvas from '../../app/Canvas'
 
-import { exampleMap, flatMap, ActionModes } from './constants';
+import { exampleMap, flatMap, microMap, ActionModes } from './constants';
 import { runGame, useControls } from './game';
 
 const actions: {
@@ -19,7 +19,7 @@ const actions: {
 ]
 
 const Blocks02 = () => {
-  const { activeAction, setActionMode, setGameMap } = useControls();
+  const { activeAction, setActionMode, setGameMap, setGameMapOrientation } = useControls();
 
   return (
       <>
@@ -34,8 +34,10 @@ const Blocks02 = () => {
               {label}
             </button>
           )}
-          <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Example map</button>
-          <button onClick={() => setGameMap(flatMap)}>Flat map</button>
+          <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Default</button>
+          <button onClick={() => setGameMap(flatMap)}>Flat</button>
+          <button onClick={() => setGameMap(microMap)}>Micro</button>
+          <button onClick={() => setGameMapOrientation(1)}>y</button>
         </div>
         <details className="mt-10">
           <summary>What works?</summary>

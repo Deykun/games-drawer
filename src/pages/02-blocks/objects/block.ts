@@ -1,3 +1,5 @@
+import { Orientation } from '../constants';
+
 import { IsometricObject, scaleFactor } from './meta/isometric_object';
 
 import Image0001 from '../assets/0001.png';
@@ -41,13 +43,20 @@ export class Block extends IsometricObject {
   renderIndex: number;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, type, z, x, y }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, type: string, z: number, x: number, y: number}) {
-    super({ z, x, y });
+  constructor ({ canvas, ctx, type, z, x, y, orientation }: {
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    type: string,
+    z: number,
+    x: number,
+    y: number,
+    orientation: Orientation
+  }) {
+    super({ z, x, y, orientation });
 
     this.canvas = canvas;
     this.ctx = ctx;
     this.type = type;
-    this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
   draw() {
@@ -62,7 +71,7 @@ export class Block extends IsometricObject {
 
     // this.ctx.textBaseline = "top";
     // this.ctx.fillStyle = 'white';
-    // this.ctx.fillText(`${this.position.x},${this.position.y},${this.position.z}`, this.x, this.y);
+    // this.ctx.fillText(this.location, this.x, this.y);
   }
 
   wasClicked(object?: { x: number, y: number }) {
