@@ -24,7 +24,8 @@ const refreshObjectsForRender = () => {
 const setMapOrientation = (orientation: Orientation) => {
   const newObjectsByPostion: {
     [location: string]: Block,
-  } = {}
+  } = {};
+
   Object.values(objectsByPosition).forEach((object) => {
     const newLocation = object.transpose(orientation);
 
@@ -44,7 +45,7 @@ const setMap = (map: string[][][]) => {
       y.forEach((type, xIndex) => {
         const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex, orientation: mapOrientation });
 
-        objectsByPosition[`${xIndex}x${yIndex}x${zIndex}`] = object;
+        objectsByPosition[object.location] = object;
       });
     });
   });

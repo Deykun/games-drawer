@@ -3,11 +3,11 @@ import { Orientation } from '../../constants'
 const maxZ = 5;
 
 const topPadding = 20;
-const leftPadding = 50;
+const leftPadding = 200;
 
 const tileWidth = 16;
 const tileHeight = 8;
-export const scaleFactor = 4;
+export const scaleFactor = 3;
 
 export class IsometricObject {
   x: number;
@@ -63,12 +63,17 @@ export class IsometricObject {
     this.y = topPadding + Math.floor(tileHeight * y * scaleFactor / 2) + ((maxZ - z) * tileHeight * scaleFactor);
   }
 
-  transpose(orientation: Orientation) {
+  transpose() {
     const oldX = this.position.x;
     const oldY = this.position.y;
 
-    this.position.x = oldY;
+    this.position.x = -oldY;
     this.position.y = oldX;
+
+    console.log({
+      old: [oldX, oldY].join(', '),
+      new: [this.position.x, this.position.y].join(', '),
+    })
 
     // 0,0 -> 0,0
     // 1,0 -> 0,1

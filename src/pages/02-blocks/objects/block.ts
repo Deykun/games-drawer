@@ -69,9 +69,9 @@ export class Block extends IsometricObject {
 
     this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 
-    // this.ctx.textBaseline = "top";
-    // this.ctx.fillStyle = 'white';
-    // this.ctx.fillText(this.location, this.x, this.y);
+    this.ctx.textBaseline = "top";
+    this.ctx.fillStyle = 'white';
+    this.ctx.fillText(this.location, this.x, this.y);
   }
 
   wasClicked(object?: { x: number, y: number }) {
@@ -166,5 +166,15 @@ export class Block extends IsometricObject {
     }
 
     return false;
+  }
+
+  transpose() {
+    const newLocation = super.transpose();
+    // const [...rest, last] = this.type;
+    // this.type = [this.type.at(-1), this.type.substring(0,3)].join('');
+    this.rotate();
+    // console.log({ type: this.type });
+    
+    return newLocation;
   }
 }
