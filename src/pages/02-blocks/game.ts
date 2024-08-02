@@ -9,7 +9,6 @@ let objectsByPosition: {
   [location: string]: Block,
 } = {};
 let objectsSortedForRender: IsometricObject[] = [];
-let mapOrientation: 0 | 1 | 2 | 3 = 0;
 let pointer: Pointer | undefined = undefined;
 
 let activeMode: ActionModes = 'random';
@@ -21,13 +20,13 @@ const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
 }
 
-const setMapOrientation = (orientation: Orientation) => {
+const setMapOrientation = () => {
   const newObjectsByPostion: {
     [location: string]: Block,
   } = {};
 
   Object.values(objectsByPosition).forEach((object) => {
-    const newLocation = object.transpose(orientation);
+    const newLocation = object.transpose();
 
     newObjectsByPostion[newLocation] = object;
   })
@@ -37,13 +36,16 @@ const setMapOrientation = (orientation: Orientation) => {
   refreshObjectsForRender();
 };
 
+// To put 0,0,0 near the center
+const offsetMap = 4;
+
 const setMap = (map: string[][][]) => {
   objectsByPosition = {};
 
   map.forEach((z, zIndex) => {
     z.forEach((y, yIndex) => {
       y.forEach((type, xIndex) => {
-        const object = new Block({ canvas, ctx, type, z: zIndex, x: xIndex, y: yIndex, orientation: mapOrientation });
+        const object = new Block({ canvas, ctx, type, x: xIndex - offsetMap, y: yIndex - offsetMap, z: zIndex });
 
         objectsByPosition[object.location] = object;
       });
@@ -197,8 +199,8 @@ export const useControls = () => {
     setMap(map);
   }, []);
 
-  const setGameMapOrientation = useCallback((newOrientation: 0 | 1 | 2 | 3) => {
-    setMapOrientation(newOrientation);
+  const setGameMapOrientation = useCallback(() => {
+    setMapOrientation();
   }, []);
 
   return {

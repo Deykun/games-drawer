@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import Canvas from '../../app/Canvas'
 
-import { exampleMap, flatMap, microMap, ActionModes } from './constants';
+import { exampleMap, flatMap, ActionModes } from './constants';
 import { runGame, useControls } from './game';
 
 const actions: {
@@ -36,8 +36,7 @@ const Blocks02 = () => {
           )}
           <button onClick={() => setGameMap(exampleMap)} className="ml-auto">Default</button>
           <button onClick={() => setGameMap(flatMap)}>Flat</button>
-          <button onClick={() => setGameMap(microMap)}>Micro</button>
-          <button onClick={() => setGameMapOrientation(1)}>y</button>
+          <button onClick={() => setGameMapOrientation()}>Rotate</button>
         </div>
         <details className="mt-10">
           <summary>What works?</summary>

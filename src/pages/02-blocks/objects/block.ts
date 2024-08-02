@@ -37,24 +37,20 @@ const BlockByType: {
 export const BlockTypes = Object.keys(BlockByType) as string[];
 
 export class Block extends IsometricObject {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   type: string;
-  renderIndex: number;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, type, z, x, y, orientation }: {
+  constructor ({ canvas, ctx, type, z, x, y }: {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     type: string,
     z: number,
     x: number,
     y: number,
-    orientation: Orientation
   }) {
-    super({ z, x, y, orientation });
+    super({ canvas, z, x, y });
 
-    this.canvas = canvas;
     this.ctx = ctx;
     this.type = type;
   }
@@ -69,9 +65,9 @@ export class Block extends IsometricObject {
 
     this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
 
-    this.ctx.textBaseline = "top";
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillText(this.location, this.x, this.y);
+    // this.ctx.textBaseline = "top";
+    // this.ctx.fillStyle = 'white';
+    // this.ctx.fillText(this.location, this.x, this.y);
   }
 
   wasClicked(object?: { x: number, y: number }) {
@@ -154,6 +150,7 @@ export class Block extends IsometricObject {
       ['1110', '1011', '1101', '0111'],
       ['1111'],
     ].find((arr) => arr.includes(this.type));
+        // this.type = [this.type.at(-1), this.type.substring(0,3)].join('');
 
     if (Array.isArray(rotationArray)) {
       const currentIndex = rotationArray.findIndex((type) => this.type === type);
@@ -170,10 +167,8 @@ export class Block extends IsometricObject {
 
   transpose() {
     const newLocation = super.transpose();
-    // const [...rest, last] = this.type;
-    // this.type = [this.type.at(-1), this.type.substring(0,3)].join('');
+
     this.rotate();
-    // console.log({ type: this.type });
     
     return newLocation;
   }

@@ -1,15 +1,9 @@
 import { Orientation } from '../../constants'
 
-const maxZ = 5;
-
-const topPadding = 20;
-const leftPadding = 200;
-
-const tileWidth = 16;
-const tileHeight = 8;
-export const scaleFactor = 3;
+export const scaleFactor = 2;
 
 export class IsometricObject {
+  canvas: HTMLCanvasElement;
   x: number;
   y: number;
   position: {
@@ -24,17 +18,21 @@ export class IsometricObject {
   width: number;
 
   setCanvasDrawData({ x, y, z }: { x: number, y: number, z: number }) {
-    this.x = tileWidth * x * scaleFactor + leftPadding;
-    if (y % 2 === 1) {
-      this.x = this.x + ((tileWidth * scaleFactor) / 2)
-    }
-    this.y = topPadding + Math.floor(tileHeight * y * scaleFactor / 2) + ((maxZ - z) * tileHeight * scaleFactor);
+    const paddingTop = Math.floor(this.canvas.height/ 2);
+    const paddingLeft = Math.floor(this.canvas.width / 2);
+    const isoX = x * this.width / 2;
+    const isoY = y * this.width / 2;
+    const isoZ = z * this.width / 2;
+
+    this.x = paddingLeft + (isoY - isoX);
+    this.y = paddingTop + (isoX + isoY) / 2 - isoZ;
+
     this.location = `${x}x${y}x${z}`
     this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
-  constructor ({ z, x, y, orientation }: { z: number, x: number, y: number, orientation?: Orientation }) {
-
+  constructor ({ canvas, z, x, y, orientation }: {     canvas: HTMLCanvasElement, z: number, x: number, y: number, orientation?: Orientation }) {
+    this.canvas = canvas;
     this.position = {
       x,
       y,
@@ -56,30 +54,15 @@ export class IsometricObject {
   move({ x, y, z }: { x: number, y: number, z: number}) {
     this.position = { x, y, z };
 
-    this.x = tileWidth * x * scaleFactor + leftPadding;
-    if (y % 2 === 1) {
-      this.x = this.x + ((tileWidth * scaleFactor) / 2)
-    }
-    this.y = topPadding + Math.floor(tileHeight * y * scaleFactor / 2) + ((maxZ - z) * tileHeight * scaleFactor);
+    this.setCanvasDrawData(this.position)
   }
 
   transpose() {
     const oldX = this.position.x;
     const oldY = this.position.y;
 
-    this.position.x = -oldY;
-    this.position.y = oldX;
-
-    console.log({
-      old: [oldX, oldY].join(', '),
-      new: [this.position.x, this.position.y].join(', '),
-    })
-
-    // 0,0 -> 0,0
-    // 1,0 -> 0,1
-    // 2,0 -> 0,2
-    // 1,1 -> -1, 1
-    // 1,2 -> -1, 2
+    this.position.x = oldY;
+    this.position.y = -oldX;
 
     this.setCanvasDrawData(this.position)
 
