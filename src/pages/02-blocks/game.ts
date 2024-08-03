@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem, clamp } from '../../utils/math'
 import { defaultMap, ActionModes, SavedPoint, SupportedKeys } from './constants'
+import { getPositionFromXY } from './utils/isometric';
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
@@ -9,14 +10,17 @@ let objectsByPosition: {
 } = {};
 let objectsSortedForRender: Block[] = [];
 let pointer: Pointer | undefined = undefined;
+let pointer2: Pointer | undefined = undefined;
 
 let activeMode: ActionModes = 'build';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
-let screenOffsetX = -25;
-let screenOffsetY = 50;
-let zoomLevel = 2;
+let screenOffsetX = 0;
+let screenOffsetY = 0;
+
+// let zoomLevel = 2;
+let zoomLevel = 8;
 
 const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
@@ -50,7 +54,7 @@ const setMap = (points: SavedPoint[]) => {
   objectsByPosition = {};
 
   points.forEach((point) => {
-      const object = new Block({ canvas, ctx, ...point, zoomLevel });
+      const object = new Block({ ctx, ...point, zoomLevel });
 
       objectsByPosition[object.location] = object;
   });
@@ -66,13 +70,17 @@ const drawMap = () => {
   if (pointer) {
     pointer.draw({ activeMode, screenOffsetX, screenOffsetY });
   }
+
+  if (pointer2) {
+    pointer2.draw({ activeMode, screenOffsetX, screenOffsetY });
+  }
 }
 
 const fps = 25;
 const renderFrame = () => {
   setTimeout(() => {
     if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight) {
-      screenOffsetX = pressedKeys.ArrowLeft ? screenOffsetX - 5 : screenOffsetX + 5;
+      screenOffsetX = pressedKeys.ArrowRight ? screenOffsetX - 5 : screenOffsetX + 5;
     }
 
     if (pressedKeys.ArrowUp || pressedKeys.ArrowDown) {
@@ -95,6 +103,44 @@ const pressedKeys: SupportedKeys = {
 
 const allowedKeys = Object.keys(pressedKeys);
 
+const setPointer = ({ x, y }: { x: number, y: number}) => {
+  const hoveredObjectIndex = objectsSortedForRender.findLastIndex((object) => object.isRenderedAt({ x, y }));
+  const hoveredObject = objectsSortedForRender[hoveredObjectIndex];
+
+  if (hoveredObject) {
+    const position = hoveredObject.position;
+    const newPosition = {
+      ...position,
+      z: position.z + 1
+    };
+
+    const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
+    const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
+    if (isBlocked) {
+      pointer = undefined;
+
+      return;
+    }
+
+    if (!pointer) {
+      pointer = new Pointer({ ctx, zoomLevel, ...newPosition });
+
+      return;
+    }
+
+    pointer.move(newPosition);
+
+    const { x: posX, y: posY } = getPositionFromXY({ x, y, screenOffsetX, screenOffsetY, zoomLevel });
+    if (!pointer2) {
+      pointer2 = new Pointer({ ctx, zoomLevel, x: posX, y: posY, z: 0 });
+
+      return;
+    }
+
+    pointer2.move({ x: posX, y: posY, z: 1 });
+  }
+};
+
 const initEventListeners = () => {
   window.addEventListener('keydown', (e) => {
     if (allowedKeys.includes(e.key)) {
@@ -113,32 +159,7 @@ const initEventListeners = () => {
     const x = event.clientX - rect.left - screenOffsetX;
     const y = event.clientY - rect.top - screenOffsetY;
 
-    const hoveredObjectIndex = objectsSortedForRender.findLastIndex((object) => object.wasClicked({ x, y }));
-    const hoveredObject = objectsSortedForRender[hoveredObjectIndex];
-
-    if (hoveredObject) {
-      const position = hoveredObject.position;
-      const newPosition = {
-        ...position,
-        z: position.z + 1
-      };
-
-      const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
-      const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
-      if (isBlocked) {
-        pointer = undefined;
-
-        return;
-      }
-
-      if (!pointer) {
-        pointer = new Pointer({ canvas, ctx, zoomLevel, ...newPosition });
-
-        return;
-      }
-
-      pointer.move(newPosition);
-    }
+    setPointer({ x, y });
   });
 
   canvas.addEventListener('wheel', (event) => {
@@ -148,17 +169,17 @@ const initEventListeners = () => {
       zoomLevel = Math.round(zoomLevel - 1);
     }
 
-    zoomLevel = clamp(0.5, zoomLevel, 8);
+    zoomLevel = clamp(0.5, zoomLevel, 10);
 
     pointer = undefined;
+    pointer2 = undefined;
 
     setNewZoomLevel();
   });
 
   canvas.addEventListener('mouseleave', () => {
-    if (pointer) {
-      pointer = undefined;
-    }
+    pointer = undefined;
+    pointer2 = undefined;
   });
 
   canvas.addEventListener('click', (event) => {
@@ -166,8 +187,22 @@ const initEventListeners = () => {
     const x = event.clientX - rect.left - screenOffsetX;
     const y = event.clientY - rect.top - screenOffsetY;
 
-    const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => object.wasClicked({ x, y }));
+    const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => object.isRenderedAt({ x, y }));
     const clickedObject = objectsSortedForRender[clickedObjectIndex];
+    
+    const { diff: diffNew } = getPositionFromXY({ x, y, screenOffsetX, screenOffsetY, zoomLevel });
+    const diffOld = clickedObject.position.y - clickedObject.position.x;
+    console.log({ 
+      type: 'old',
+      x, y,
+      location: clickedObject?.location,
+    });
+    console.log({
+      diffNew,
+      diffOld,
+      close: diffNew - diffOld,
+    })
+
 
     if (clickedObject) {
       if (activeMode === 'rotate') {
@@ -191,6 +226,8 @@ const initEventListeners = () => {
           delete objectsByPosition[clickedObject.location];
 
           refreshObjectsForRender();
+
+          setPointer({ x, y });
         }
       }
 
@@ -208,7 +245,7 @@ const initEventListeners = () => {
         const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
         const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
         if (!isBlocked) {
-          const object = new Block({ canvas, ctx, type: '1111', zoomLevel, ...newPosition });
+          const object = new Block({ ctx, type: '1111', zoomLevel, ...newPosition });
 
           objectsByPosition[objectAboveLocation] = object;
 
@@ -225,6 +262,9 @@ export const runGame = ({ canvas: gameCanvas, ctx: gameCtx }: { canvas: HTMLCanv
   canvas = gameCanvas;
   ctx = gameCtx;
   ctx.imageSmoothingEnabled = false;
+
+  screenOffsetX = -25 + Math.floor(canvas.width / 2);
+  screenOffsetY = 50 + Math.floor(canvas.height / 2);
 
   setMap(defaultMap);
 

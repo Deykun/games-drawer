@@ -1,8 +1,7 @@
-const tileHeight = 17;
-const tileWidth = 16
+export const tileHeight = 17;
+export const tileWidth = 16
 
 export class IsometricObject {
-  canvas: HTMLCanvasElement;
   x: number;
   y: number;
   position: {
@@ -17,21 +16,18 @@ export class IsometricObject {
   width: number;
 
   setCanvasDrawData({ x, y, z }: { x: number, y: number, z: number }) {
-    const paddingTop = Math.floor(this.canvas.height/ 2);
-    const paddingLeft = Math.floor(this.canvas.width / 2);
     const isoX = x * this.width / 2;
     const isoY = y * this.width / 2;
     const isoZ = z * this.width / 2;
 
-    this.x = paddingLeft + (isoY - isoX);
-    this.y = paddingTop + (isoX + isoY) / 2 - isoZ;
+    this.x = isoY - isoX;
+    this.y = (isoX + isoY) / 2 - isoZ;
 
     this.location = `${x}x${y}x${z}`
     this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
-  constructor ({ canvas, z, x, y, zoomLevel }: {     canvas: HTMLCanvasElement, z: number, x: number, y: number, zoomLevel: number }) {
-    this.canvas = canvas;
+  constructor ({ z, x, y, zoomLevel }: { z: number, x: number, y: number, zoomLevel: number }) {
     this.position = {
       x,
       y,

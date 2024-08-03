@@ -26,4 +26,5 @@ export const flatMap: SavedPoint[] = axisBase.reduce((points: SavedPoint[], x) =
   return points;
 }, []);
 
-export const defaultMap = exampleMap;
+// export const defaultMap = exampleMap;
+export const defaultMap = flatMap;
