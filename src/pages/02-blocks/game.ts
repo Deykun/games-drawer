@@ -12,7 +12,8 @@ let objectsSortedForRender: Block[] = [];
 let pointer: Pointer | undefined = undefined;
 let pointer2: Pointer | undefined = undefined;
 
-let activeMode: ActionModes = 'build';
+// let activeMode: ActionModes = 'build';
+let activeMode: ActionModes = 'rotate';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
@@ -130,14 +131,14 @@ const setPointer = ({ x, y }: { x: number, y: number}) => {
 
     pointer.move(newPosition);
 
-    const { x: posX, y: posY } = getPositionFromXY({ x, y, screenOffsetX, screenOffsetY, zoomLevel });
-    if (!pointer2) {
-      pointer2 = new Pointer({ ctx, zoomLevel, x: posX, y: posY, z: 0 });
+    // const { x: posX, y: posY } = getPositionFromXY({ x, y, screenOffsetX, screenOffsetY, zoomLevel });
+    // if (!pointer2) {
+    //   pointer2 = new Pointer({ ctx, zoomLevel, x: posX, y: posY, z: 0 });
 
-      return;
-    }
+    //   return;
+    // }
 
-    pointer2.move({ x: posX, y: posY, z: 1 });
+    // pointer2.move({ x: posX, y: posY, z: 1 });
   }
 };
 
