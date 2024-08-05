@@ -42,6 +42,7 @@ const Blocks02 = () => {
           <ul className="list-disc ml-10">
             <li>Isometric rendering.</li>
             <li>Detecting clicked block.</li>
+            <li>Rotating, building, and modifying.</li>
           </ul>
         </details>
       </>

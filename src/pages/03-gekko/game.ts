@@ -71,8 +71,12 @@ const drawPlayer = () => {
   player.draw();
 }
 
+const fps = 40;
 const renderFrame = () => {
-  window.requestAnimationFrame(renderFrame);
+  setTimeout(() => {
+
+    window.requestAnimationFrame(renderFrame);
+  }, 1000 / fps);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawLevel();

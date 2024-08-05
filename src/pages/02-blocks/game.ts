@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getRandomItem, clamp } from '../../utils/math'
+import { getRandomItem, clamp, round } from '../../utils/math'
 import { defaultMap, ActionModes, SavedPoint, SupportedKeys } from './constants'
 import { getClickPrelimits } from './utils/isometric';
 import { Block, BlockTypes } from './objects/block'
@@ -18,7 +18,7 @@ let ctx = undefined as unknown as CanvasRenderingContext2D;
 let screenOffsetX = 0;
 let screenOffsetY = 0;
 
-let zoomLevel = 3;
+let zoomLevel = 2;
 
 const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
@@ -70,7 +70,7 @@ const drawMap = () => {
   }
 }
 
-const fps = 25;
+const fps = 40;
 const renderFrame = () => {
   setTimeout(() => {
     if (pressedKeys.ArrowLeft || pressedKeys.ArrowRight) {
@@ -157,12 +157,12 @@ const initEventListeners = () => {
 
   canvas.addEventListener('wheel', (event) => {
     if (event.deltaY < 0) {
-      zoomLevel = Math.round(zoomLevel + 1);
+      zoomLevel = round(zoomLevel + 0.5, 1);
     } else {
-      zoomLevel = Math.round(zoomLevel - 1);
+      zoomLevel = round(zoomLevel - 0.5, 1);
     }
 
-    zoomLevel = clamp(0.5, zoomLevel, 10);
+    zoomLevel = clamp(0.5, zoomLevel, 8);
 
     pointer = undefined;
 
@@ -237,8 +237,6 @@ const initEventListeners = () => {
           refreshObjectsForRender();
         }
       }
-
-      renderFrame();
     }
   })
 }
