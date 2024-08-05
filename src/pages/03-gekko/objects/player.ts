@@ -136,7 +136,7 @@ export class Player {
     const isMovingX = [pressedKeys.ArrowLeft, pressedKeys.ArrowRight].filter(Boolean).length;
 
     const timeDiffrenceInMs = (new Date().getTime()) - this.prevTime;
-    if (timeDiffrenceInMs > 100) {
+    if (timeDiffrenceInMs > 300) {
       if (isMovingX) {
         this.animationFrame += 1;
       } else {

@@ -19,14 +19,18 @@ const PointerByActiveMode: {
 }
 
 export class Pointer extends IsometricObject {
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, z, x, y, zoomLevel }: { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, z: number, x: number, y: number, zoomLevel: number }) {
-    super({ canvas, z, x, y, zoomLevel });
+  constructor ({ ctx, z, x, y, zoomLevel }: {
+    ctx: CanvasRenderingContext2D,
+    z: number,
+    x: number,
+    y: number,
+    zoomLevel: number
+  }) {
+    super({ z, x, y, zoomLevel });
 
-    this.canvas = canvas;
     this.ctx = ctx;
   }
 

@@ -39,8 +39,7 @@ export class Block extends IsometricObject {
   type: string;
   image?: HTMLImageElement;
 
-  constructor ({ canvas, ctx, type, z, x, y, zoomLevel }: {
-    canvas: HTMLCanvasElement,
+  constructor ({ ctx, type, z, x, y, zoomLevel }: {
     ctx: CanvasRenderingContext2D,
     type: string,
     z: number,
@@ -48,7 +47,7 @@ export class Block extends IsometricObject {
     y: number,
     zoomLevel: number,
   }) {
-    super({ canvas, z, x, y, zoomLevel });
+    super({ z, x, y, zoomLevel });
 
     this.ctx = ctx;
     this.type = type;
@@ -66,10 +65,13 @@ export class Block extends IsometricObject {
 
     // this.ctx.textBaseline = "top";
     // this.ctx.fillStyle = 'white';
-    // this.ctx.fillText(this.location, this.x, this.y);
+    // this.ctx.font = `9px Arial`;
+    // const x = this.width / 2 - 8;
+    // const y = this.width / 4 - 5;
+    // this.ctx.fillText(`${this.position.x},${this.position.y}`, this.x + screenOffsetX + x, this.y + screenOffsetY + y);
   }
 
-  wasClicked(object?: { x: number, y: number }) {
+  isRenderedAt(object?: { x: number, y: number }) {
     if (!object || !this.image) {
       return false;
     }

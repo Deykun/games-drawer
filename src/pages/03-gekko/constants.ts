@@ -1,7 +1,7 @@
-export const scaleFactor = 5;
+export const scaleFactor = 4;
 
-export const gravity = 4;
-export const jumpPower = -15;
+export const gravity = 7;
+export const jumpPower = -20;
 
 type PointX = {
   x: number,
