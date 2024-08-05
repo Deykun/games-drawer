@@ -10,18 +10,15 @@ let objectsByPosition: {
 } = {};
 let objectsSortedForRender: Block[] = [];
 let pointer: Pointer | undefined = undefined;
-let pointer2: Pointer | undefined = undefined;
 
-// let activeMode: ActionModes = 'build';
-let activeMode: ActionModes = 'rotate';
+let activeMode: ActionModes = 'build';
 
 let canvas = undefined as unknown as HTMLCanvasElement;
 let ctx = undefined as unknown as CanvasRenderingContext2D;
 let screenOffsetX = 0;
 let screenOffsetY = 0;
 
-// let zoomLevel = 2;
-let zoomLevel = 8;
+let zoomLevel = 3;
 
 const refreshObjectsForRender = () => {
   objectsSortedForRender = Object.values(objectsByPosition).sort((a, b) => a.renderIndex - b.renderIndex);
@@ -70,10 +67,6 @@ const drawMap = () => {
 
   if (pointer) {
     pointer.draw({ activeMode, screenOffsetX, screenOffsetY });
-  }
-
-  if (pointer2) {
-    pointer2.draw({ activeMode: 'random', screenOffsetX, screenOffsetY });
   }
 }
 
@@ -172,14 +165,12 @@ const initEventListeners = () => {
     zoomLevel = clamp(0.5, zoomLevel, 10);
 
     pointer = undefined;
-    pointer2 = undefined;
 
     setNewZoomLevel();
   });
 
   canvas.addEventListener('mouseleave', () => {
     pointer = undefined;
-    pointer2 = undefined;
   });
 
   canvas.addEventListener('click', (event) => {
