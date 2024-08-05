@@ -1,85 +1,49 @@
-import { tileWidth, tileHeight } from '../objects/meta/isometric_object';
+import { tileWidth } from '../objects/meta/isometric_object';
 
-const canvasWidth = 600;
-
-export const getPositionFromXY = ({
+export const getClickPrelimits = ({
   x: canvasX,
-  y: canvasY,
-  screenOffsetX,
-  screenOffsetY,
+  // y: canvasY,
   zoomLevel,
-}: { x: number, y: number, screenOffsetX: number, screenOffsetY: number, zoomLevel: number }) => {
-  
+}: { x: number, y: number, zoomLevel: number }) => {
   const canvasTileWidth = zoomLevel * tileWidth;
-  const canvasTileHeigh = zoomLevel * tileHeight;
-  // const canvasTileWidth = tileWidth;
 
-  // 0,0 - start of 0,0,0 tile
-  // const canvasX = (x + screenOffsetX - canvasTileWidth) / zoomLevel;
-  // // const canvasY = (y + screenOffsetY) / zoomLevel;
-  // // const canvasY = (y + screenOffsetY) / zoomLevel;
-  // const canvasY = (screenOffsetY / zoomLevel) - ((screenOffsetY / zoomLevel) - y);
-
-  // 0x3
-
-  const differenceBetwenXandY = (canvasY - (canvasX * 2)) / canvasTileWidth;
-
-  const calculatedOffsetX = canvasX / canvasTileWidth;
-  const calculatedOffsetY = canvasY / canvasTileHeigh / 2;
-  // const calculatedOffsetY = (canvasY * zoomLevel) / canvasTileWidth;
-  // const calculatedOffsetY = 0;
-
-
-  const positionX = Math.floor(calculatedOffsetX);
-  const positionY = Math.floor(calculatedOffsetY);
-
-  console.log({
-    cX: calculatedOffsetX,
-    // cY: calculatedOffsetY,
-    location: `${positionX}x${positionY}`,
-    // differenceBetwenXandY,
-    canvasX,
-    canvasY,
-    // canvasTileWidth,
-    // canvasTileHeigh,
-  });
-
-
-
-  // const location = `${Math.floor(positionX)}x${Math.floor(positionY)}`;
-
-  // console.log({
-  //   type: 'new',
-  //   location,
-  // });
-
-
-
-   // Calculate isoX and isoY
-  //  const isoX = canvasY - (canvasX / 2);
-  //  const isoY = canvasY + (canvasX / 2);
-   
-  //  // Calculate x and y
-  //  const positionXraw = (2 * isoX) / canvasTileWidth;
-  //  const positionYraw = (2 * isoY) / canvasTileWidth;
-
-  //   // Calculate x and y
-  //   const positionX = positionXraw + 1;
-  //   const positionY = positionYraw + 4;
-   
-  //  return { x, y };
-
-
-  // const positionX = (canvasY - canvasX) / canvasTileWidth;
-  // const positionY = (canvasX + canvasY) / canvasTileWidth;
-
-  // const positionX = Math.floor((canvasY - canvasX) / canvasTileWidth) + 1;
-  // const positionY = Math.floor((canvasX + canvasY) / canvasTileWidth) + 4;
-
+  const diffrenceBetwenYAndX = Math.round(canvasX * 2 / canvasTileWidth);
 
   return {
-    diff: positionY - positionX,
-    x: positionX,
-    y: positionY,
+    YXDiffMin: diffrenceBetwenYAndX - 1,
+    YXDiffMax: diffrenceBetwenYAndX + 1,
   }
-};
+}
+
+// It's tricky
+
+// export const getPositionFromXY = ({
+//   x: canvasX,
+//   y: canvasY,
+//   zoomLevel,
+// }: { x: number, y: number, zoomLevel: number }) => {
+  
+//   const canvasTileWidth = zoomLevel * tileWidth;
+//   const canvasTileHeigh = zoomLevel * tileHeight;
+
+//   const restX = canvasX * 2 / canvasTileWidth;
+//   const restY = canvasY / canvasTileHeigh;
+//   const diffrenceBetwenXAndY = Math.round(restX);
+
+ 
+//   // const positionX = 0;
+//   const positionXRaw = (canvasX / canvasTileWidth);
+//   const positionYRaw = (positionXRaw + diffrenceBetwenXAndY) - 1;
+
+//   const verticalOffsetRaw = (canvasY / canvasTileWidth * 2);
+//   const verticalOffset = Math.round(verticalOffsetRaw);
+
+//   const positionX = Math.round(positionXRaw) - diffrenceBetwenXAndY + verticalOffset;
+//   const positionY = Math.round(positionYRaw) - diffrenceBetwenXAndY + verticalOffset;
+
+//   return {
+//     diff: positionY - positionX,
+//     x: positionX,
+//     y: positionY,
+//   }
+// };

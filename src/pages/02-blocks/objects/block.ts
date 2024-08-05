@@ -63,11 +63,12 @@ export class Block extends IsometricObject {
 
     this.ctx.drawImage(this.image, this.x + screenOffsetX, this.y + screenOffsetY, this.width, this.height);
 
-    this.ctx.textBaseline = "top";
-    this.ctx.fillStyle = 'white';
-    const x = this.width / 2 - 10;
-    const y = this.width / 4 - 10;
-    this.ctx.fillText(`${this.position.x} x ${this.position.y}`, this.x + screenOffsetX + x, this.y + screenOffsetY + y);
+    // this.ctx.textBaseline = "top";
+    // this.ctx.fillStyle = 'white';
+    // this.ctx.font = `9px Arial`;
+    // const x = this.width / 2 - 8;
+    // const y = this.width / 4 - 5;
+    // this.ctx.fillText(`${this.position.x},${this.position.y}`, this.x + screenOffsetX + x, this.y + screenOffsetY + y);
   }
 
   isRenderedAt(object?: { x: number, y: number }) {

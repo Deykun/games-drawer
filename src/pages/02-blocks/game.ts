@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getRandomItem, clamp } from '../../utils/math'
 import { defaultMap, ActionModes, SavedPoint, SupportedKeys } from './constants'
-import { getPositionFromXY } from './utils/isometric';
+import { getClickPrelimits } from './utils/isometric';
 import { Block, BlockTypes } from './objects/block'
 import { Pointer } from './objects/pointer'
 
@@ -73,7 +73,7 @@ const drawMap = () => {
   }
 
   if (pointer2) {
-    pointer2.draw({ activeMode, screenOffsetX, screenOffsetY });
+    pointer2.draw({ activeMode: 'random', screenOffsetX, screenOffsetY });
   }
 }
 
@@ -105,7 +105,16 @@ const pressedKeys: SupportedKeys = {
 const allowedKeys = Object.keys(pressedKeys);
 
 const setPointer = ({ x, y }: { x: number, y: number}) => {
-  const hoveredObjectIndex = objectsSortedForRender.findLastIndex((object) => object.isRenderedAt({ x, y }));
+  const { YXDiffMin, YXDiffMax } = getClickPrelimits({ x, y, zoomLevel });
+  const hoveredObjectIndex = objectsSortedForRender.findLastIndex((object) => {
+    const objectYXDiff = object.position.y - object.position.x;
+    if (objectYXDiff < YXDiffMin || objectYXDiff > YXDiffMax) {
+      return false;
+    }
+
+    return object.isRenderedAt({ x, y })
+  });
+
   const hoveredObject = objectsSortedForRender[hoveredObjectIndex];
 
   if (hoveredObject) {
@@ -130,15 +139,6 @@ const setPointer = ({ x, y }: { x: number, y: number}) => {
     }
 
     pointer.move(newPosition);
-
-    // const { x: posX, y: posY } = getPositionFromXY({ x, y, screenOffsetX, screenOffsetY, zoomLevel });
-    // if (!pointer2) {
-    //   pointer2 = new Pointer({ ctx, zoomLevel, x: posX, y: posY, z: 0 });
-
-    //   return;
-    // }
-
-    // pointer2.move({ x: posX, y: posY, z: 1 });
   }
 };
 
@@ -156,9 +156,8 @@ const initEventListeners = () => {
   })
 
   canvas.addEventListener('mousemove', (event) => {
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left - screenOffsetX;
-    const y = event.clientY - rect.top - screenOffsetY;
+    const x = event.offsetX - screenOffsetX;
+    const y = event.offsetY - screenOffsetY;
 
     setPointer({ x, y });
   });
@@ -184,26 +183,20 @@ const initEventListeners = () => {
   });
 
   canvas.addEventListener('click', (event) => {
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left - screenOffsetX;
-    const y = event.clientY - rect.top - screenOffsetY;
+    const x = event.offsetX - screenOffsetX;
+    const y = event.offsetY - screenOffsetY;
 
-    const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => object.isRenderedAt({ x, y }));
-    const clickedObject = objectsSortedForRender[clickedObjectIndex];
-    
-    const { diff: diffNew } = getPositionFromXY({ x, y, screenOffsetX, screenOffsetY, zoomLevel });
-    const diffOld = clickedObject.position.y - clickedObject.position.x;
-    console.log({ 
-      type: 'old',
-      x, y,
-      location: clickedObject?.location,
+    const { YXDiffMin, YXDiffMax } = getClickPrelimits({ x, y, zoomLevel });
+    const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => {
+      const objectYXDiff = object.position.y - object.position.x;
+      if (objectYXDiff < YXDiffMin || objectYXDiff > YXDiffMax) {
+        return false;
+      }
+  
+      return object.isRenderedAt({ x, y })
     });
-    console.log({
-      diffNew,
-      diffOld,
-      close: diffNew - diffOld,
-    })
 
+    const clickedObject = objectsSortedForRender[clickedObjectIndex];
 
     if (clickedObject) {
       if (activeMode === 'rotate') {
