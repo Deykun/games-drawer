@@ -3,6 +3,7 @@ import { getRandomItem, clamp, round } from '../../utils/math'
 import { defaultMap, ActionModes, SavedPoint, SupportedKeys } from './constants'
 import { getClickPrelimits } from './utils/isometric';
 import { Block, BlockTypes } from './objects/block'
+import { Car } from './objects/car';
 import { Pointer } from './objects/pointer'
 
 let objectsByPosition: {
@@ -10,6 +11,7 @@ let objectsByPosition: {
 } = {};
 let objectsSortedForRender: Block[] = [];
 let pointer: Pointer | undefined = undefined;
+let car: Car | undefined = undefined;
 
 let activeMode: ActionModes = 'build';
 
@@ -43,7 +45,9 @@ const rotateMap = () => {
 const setNewZoomLevel = () => {
   Object.values(objectsByPosition).forEach((object) => {
     object.setZoom(zoomLevel);
-  })
+  });
+
+  car?.setZoom(zoomLevel);
 
   refreshObjectsForRender();
 };
@@ -57,6 +61,8 @@ const setMap = (points: SavedPoint[]) => {
       objectsByPosition[object.location] = object;
   });
 
+  car = new Car({ ctx, x: 0, y: 0, z: 1, zoomLevel });
+
   refreshObjectsForRender();
 }
 
@@ -67,6 +73,10 @@ const drawMap = () => {
 
   if (pointer) {
     pointer.draw({ activeMode, screenOffsetX, screenOffsetY });
+  }
+
+  if (car) {
+    car.draw({ screenOffsetX, screenOffsetY });
   }
 }
 

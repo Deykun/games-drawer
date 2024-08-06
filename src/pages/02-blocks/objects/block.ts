@@ -1,27 +1,27 @@
 import { IsometricObject } from './meta/isometric_object';
 import { ObjectType } from '../constants';
 
-import Image0001 from '../assets/0001.png';
-import Image0010 from '../assets/0010.png';
-import Image0011 from '../assets/0011.png';
-import Image0100 from '../assets/0100.png';
-import Image0110 from '../assets/0110.png';
-import Image0111 from '../assets/0111.png';
-import Image1000 from '../assets/1000.png';
-import Image1001 from '../assets/1001.png';
-import Image1011 from '../assets/1011.png';
-import Image1100 from '../assets/1100.png';
-import Image1101 from '../assets/1101.png';
-import Image1110 from '../assets/1110.png';
-import Image1111 from '../assets/1111.png';
-import Image1111Flat from '../assets/1111-flat.png';
+import Image0001 from '../assets/block/0001.png';
+import Image0010 from '../assets/block/0010.png';
+import Image0011 from '../assets/block/0011.png';
+import Image0100 from '../assets/block/0100.png';
+import Image0110 from '../assets/block/0110.png';
+import Image0111 from '../assets/block/0111.png';
+import Image1000 from '../assets/block/1000.png';
+import Image1001 from '../assets/block/1001.png';
+import Image1011 from '../assets/block/1011.png';
+import Image1100 from '../assets/block/1100.png';
+import Image1101 from '../assets/block/1101.png';
+import Image1110 from '../assets/block/1110.png';
+import Image1111 from '../assets/block/1111.png';
+import Image1111Flat from '../assets/block/1111-flat.png';
 
 const DEV = {
   SHOULD_SHOW_POSITION: false,
   SHOULD_SHOW_ELEVATION: false,
 }
 
-const BlockByType: {
+const BlockByEvelation: {
   [key: string]: string,
 } = {
   '0001': Image0001,
@@ -39,7 +39,7 @@ const BlockByType: {
   '1111': Image1111,
 }
 
-export const BlockTypes = Object.keys(BlockByType) as string[];
+export const BlockTypes = Object.keys(BlockByEvelation) as string[];
 
 export class Block extends IsometricObject {
   ctx: CanvasRenderingContext2D;
@@ -68,7 +68,7 @@ export class Block extends IsometricObject {
   
     this.image = new Image();
     const isGround = this.type === 'ghost' && this.evelation === '1111';
-    this.image.src = isGround ? Image1111Flat : BlockByType[this.evelation];
+    this.image.src = isGround ? Image1111Flat : BlockByEvelation[this.evelation];
 
     this.ctx.drawImage(this.image, this.x + screenOffsetX, this.y + screenOffsetY, this.width, this.height);
 
@@ -96,7 +96,6 @@ export class Block extends IsometricObject {
         this.ctx.fillRect(this.x + screenOffsetX + cornerPosition.x, this.y + screenOffsetY + cornerPosition.y, dotSize, dotSize)
       });
     }
-
 
     if (DEV.SHOULD_SHOW_POSITION) {
       this.ctx.textBaseline = "top";
