@@ -1,3 +1,5 @@
+import { ObjectType } from '../../constants';
+
 export const tileHeight = 17;
 export const tileWidth = 16
 
@@ -9,6 +11,7 @@ export class IsometricObject {
     y: number
     z: number
   };
+  type: ObjectType;
   location: string;
   renderIndex: number;
   zoomLevel: number;
@@ -27,7 +30,7 @@ export class IsometricObject {
     this.renderIndex = (1000 * z) + (10 * y) + x;
   }
 
-  constructor ({ z, x, y, zoomLevel }: { z: number, x: number, y: number, zoomLevel: number }) {
+  constructor ({ z, x, y, zoomLevel, type = 'block' }: { z: number, x: number, y: number, zoomLevel: number, type?: ObjectType }) {
     this.position = {
       x,
       y,
@@ -37,6 +40,7 @@ export class IsometricObject {
     this.zoomLevel = zoomLevel;
     this.height = tileHeight * zoomLevel;
     this.width = tileWidth * zoomLevel;
+    this.type = type;
 
     /* Temporary to satisfy TS is set by the method below */
     this.x = 0;

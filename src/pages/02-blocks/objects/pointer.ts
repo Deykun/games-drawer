@@ -29,7 +29,7 @@ export class Pointer extends IsometricObject {
     y: number,
     zoomLevel: number
   }) {
-    super({ z, x, y, zoomLevel });
+    super({ z, x, y, zoomLevel, type: 'ghost' });
 
     this.ctx = ctx;
   }

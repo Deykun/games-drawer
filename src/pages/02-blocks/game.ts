@@ -118,7 +118,7 @@ const setPointer = ({ x, y }: { x: number, y: number}) => {
     };
 
     const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
-    const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
+    const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].evelation !== '0000';
     if (isBlocked) {
       pointer = undefined;
 
@@ -135,9 +135,14 @@ const setPointer = ({ x, y }: { x: number, y: number}) => {
   }
 };
 
-const onClick = (event: MouseEvent) => {
+const onClick = (event: MouseEvent, { isPressAction = false }: { isPressAction?: boolean } = {}) => {
   const x = event.offsetX - screenOffsetX;
   const y = event.offsetY - screenOffsetY;
+
+  if (isPressAction) {
+    // TODO: add throttling
+    return;
+  }
 
   const { YXDiffMin, YXDiffMax } = getClickPrelimits({ x, y, zoomLevel });
   const clickedObjectIndex = objectsSortedForRender.findLastIndex((object) => {
@@ -152,34 +157,38 @@ const onClick = (event: MouseEvent) => {
   const clickedObject = objectsSortedForRender[clickedObjectIndex];
 
   if (clickedObject) {
-    if (activeMode === 'rotate') {
-      clickedObject?.rotate();
-    }
+    if (!isPressAction) {
+      if (activeMode === 'rotate') {
+        clickedObject?.rotate();
+      }
 
-    if (activeMode === 'remove') {
-      delete objectsByPosition[clickedObject.location];
-
-      refreshObjectsForRender();
-    }
-    
-    if (activeMode === 'random') {
-      clickedObject.changeType(getRandomItem(BlockTypes) ?? '1111')
-    }
-
-    if (activeMode === 'decrease') {
-      const { isEmpty } = clickedObject.changeCornersNumber(-1);
-
-      if (isEmpty) {
-        delete objectsByPosition[clickedObject.location];
-
-        refreshObjectsForRender();
-
-        setPointer({ x, y });
+      if (activeMode === 'decrease') {
+        const { isEmpty } = clickedObject.changeCornersNumber(-1);
+  
+        if (isEmpty) {
+          delete objectsByPosition[clickedObject.location];
+  
+          refreshObjectsForRender();
+  
+          setPointer({ x, y });
+        }
+      }
+  
+      if (activeMode === 'increase') {
+        clickedObject.changeCornersNumber(1);
       }
     }
 
-    if (activeMode === 'increase') {
-      clickedObject.changeCornersNumber(1);
+    if (activeMode === 'remove') {
+      if (clickedObject.type !== 'ghost') {
+        delete objectsByPosition[clickedObject.location];
+
+        refreshObjectsForRender();
+      }
+    }
+    
+    if (activeMode === 'random') {
+      clickedObject.changeEvelation(getRandomItem(BlockTypes) ?? '1111')
     }
 
     if (activeMode === 'build') {
@@ -190,9 +199,9 @@ const onClick = (event: MouseEvent) => {
       };
 
       const objectAboveLocation = `${position.x}x${position.y}x${newPosition.z}`;
-      const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].type !== '0000';
+      const isBlocked = objectsByPosition[objectAboveLocation] && objectsByPosition[objectAboveLocation].evelation !== '0000';
       if (!isBlocked) {
-        const object = new Block({ ctx, type: '1111', zoomLevel, ...newPosition });
+        const object = new Block({ ctx, evelation: '1111', zoomLevel, ...newPosition });
 
         objectsByPosition[objectAboveLocation] = object;
 
@@ -231,7 +240,7 @@ const initEventListeners = () => {
     setPointer({ x, y });
 
     if (isMousePressed) {
-      onClick(event);
+      onClick(event, { isPressAction: true });
     }
   });
 
@@ -302,7 +311,7 @@ declare global {
 window.savePoints = () => {
   const compressedObjects = Object.values(objectsByPosition).map((object) => ({
     ...object.position,
-    type: object.type,
+    evelation: object.evelation,
   }));
 
   return JSON.stringify(compressedObjects);

@@ -1,4 +1,5 @@
 import { IsometricObject } from './meta/isometric_object';
+import { ObjectType } from '../constants';
 
 import Image0001 from '../assets/0001.png';
 import Image0010 from '../assets/0010.png';
@@ -13,6 +14,12 @@ import Image1100 from '../assets/1100.png';
 import Image1101 from '../assets/1101.png';
 import Image1110 from '../assets/1110.png';
 import Image1111 from '../assets/1111.png';
+import Image1111Flat from '../assets/1111-flat.png';
+
+const DEV = {
+  SHOULD_SHOW_POSITION: false,
+  SHOULD_SHOW_ELEVATION: false,
+}
 
 const BlockByType: {
   [key: string]: string,
@@ -36,39 +43,69 @@ export const BlockTypes = Object.keys(BlockByType) as string[];
 
 export class Block extends IsometricObject {
   ctx: CanvasRenderingContext2D;
-  type: string;
+  evelation: string;
   image?: HTMLImageElement;
 
-  constructor ({ ctx, type, z, x, y, zoomLevel }: {
+  constructor ({ ctx, evelation, z, x, y, zoomLevel, type }: {
     ctx: CanvasRenderingContext2D,
-    type: string,
+    evelation: string,
     z: number,
     x: number,
     y: number,
     zoomLevel: number,
+    type?: ObjectType,
   }) {
-    super({ z, x, y, zoomLevel });
+    super({ z, x, y, zoomLevel, type });
 
     this.ctx = ctx;
-    this.type = type;
+    this.evelation = evelation;
   }
 
   draw({ screenOffsetX = 0, screenOffsetY = 0 }: { screenOffsetX?: number, screenOffsetY?: number } = {}) {
-    if (this.type === '0000') {
+    if (this.evelation === '0000') {
       return;
     }
   
     this.image = new Image();
-    this.image.src = BlockByType[this.type];
+    const isGround = this.type === 'ghost' && this.evelation === '1111';
+    this.image.src = isGround ? Image1111Flat : BlockByType[this.evelation];
 
     this.ctx.drawImage(this.image, this.x + screenOffsetX, this.y + screenOffsetY, this.width, this.height);
 
-    // this.ctx.textBaseline = "top";
-    // this.ctx.fillStyle = 'white';
-    // this.ctx.font = `9px Arial`;
-    // const x = this.width / 2 - 8;
-    // const y = this.width / 4 - 5;
-    // this.ctx.fillText(`${this.position.x},${this.position.y}`, this.x + screenOffsetX + x, this.y + screenOffsetY + y);
+    if (DEV.SHOULD_SHOW_ELEVATION) {
+      const corners = this.evelation.split('');
+
+      const padding = 6 * this.zoomLevel;
+      const dotSize = 1 * this.zoomLevel;
+  
+      const minX = padding - (dotSize / 2);
+      const midX = (this.width / 2) - (dotSize / 2);
+      const maxX = (this.width) - padding - (dotSize / 2);
+      const minY = (padding / 2) - (dotSize / 2);
+      const midY = (this.width / 4) - (dotSize / 4);
+      const maxY = (this.width / 2) - (padding / 2) - (dotSize / 2);
+  
+      [
+        { x: midX, y: minY },
+        { x: maxX, y: midY },
+        { x: midX, y: maxY },
+        { x: minX, y: midY },
+      ].forEach((cornerPosition, index) => {
+        // this.ctx.fillStyle = "transparent"
+        this.ctx.fillStyle = corners[index] === '1' ? "#7dff11" : "#ff0505";
+        this.ctx.fillRect(this.x + screenOffsetX + cornerPosition.x, this.y + screenOffsetY + cornerPosition.y, dotSize, dotSize)
+      });
+    }
+
+
+    if (DEV.SHOULD_SHOW_POSITION) {
+      this.ctx.textBaseline = "top";
+      this.ctx.fillStyle = 'white';
+      this.ctx.font = `9px Arial`;
+      const x = this.width / 2 - 8;
+      const y = this.width / 4 - 5;
+      this.ctx.fillText(`${this.position.x},${this.position.y}`, this.x + screenOffsetX + x, this.y + screenOffsetY + y);
+      }
   }
 
   isRenderedAt(object?: { x: number, y: number }) {
@@ -105,12 +142,12 @@ export class Block extends IsometricObject {
     return false;
   }
 
-  changeType(type: string) {
-    this.type = type;
+  changeEvelation(evelation: string) {
+    this.evelation = evelation;
   }
 
   changeCornersNumber(modifyByNumber: -4 | -3 | -2 | -1 | 0 | 1 | 2 | 3 | 4) {
-    const currentCornerCount = (this.type.match(new RegExp("1", "g")) || []).length;
+    const currentCornerCount = (this.evelation.match(new RegExp("1", "g")) || []).length;
 
     const newCornerCount = currentCornerCount + modifyByNumber;
 
@@ -119,15 +156,15 @@ export class Block extends IsometricObject {
       return { isEmpty: false };
     }
 
-    let newType = this.type;
+    let newType = this.evelation;
     if (modifyByNumber > 0) {
       for (let i = 0; i < modifyByNumber; i++) {
         newType = newType.replace('0', '1');
       }
     } else {
-      // Not all two corner types are supported
+      // Not all two corner evelations are supported
       if (currentCornerCount === 3) {
-        if (this.type.startsWith('11')) {
+        if (this.evelation.startsWith('11')) {
           newType = '1100';
         } else {
           newType = '0011';
@@ -139,7 +176,7 @@ export class Block extends IsometricObject {
       }
     }
 
-    this.type = newType;
+    this.evelation = newType;
 
     return { isEmpty: newType === '0000' };
   }
@@ -150,13 +187,13 @@ export class Block extends IsometricObject {
       ['1100', '0110', '0011', '1001'],
       ['1110', '0111', '1011', '1101'],
       ['1111'],
-    ].find((arr) => arr.includes(this.type));
+    ].find((arr) => arr.includes(this.evelation));
     if (Array.isArray(rotationArray)) {
-      const currentIndex = rotationArray.findIndex((type) => this.type === type);
+      const currentIndex = rotationArray.findIndex((evelation) => this.evelation === evelation);
 
       const newType = rotationArray[(currentIndex + 1) % rotationArray.length];
 
-      this.changeType(newType);
+      this.changeEvelation(newType);
 
       return true;
     }
